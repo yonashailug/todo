@@ -1,11 +1,13 @@
 import { TestBed, inject } from '@angular/core/testing';
 
+import { HttpModule } from '@angular/http';
 import { TodoService } from './todo.service';
 
 describe('TodoService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [TodoService]
+      providers: [TodoService],
+      imports: [HttpModule]
     });
   });
 
