@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+
+// @import '../node_modules/@angular/material/prebuilt-themes/indigo-pink.css';
+@import "./_theme.scss";
+@import '../node_modules/dragula/dist/dragula.css';
+html {
+    font-size: 16px;
+}
+
+*,
+*:after,
+*:before {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+}
+
+body {
+    background: #f1f1f1;
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
+}
+
+.mat-form-field-underline {
+    display: none;
+}
+
+.mat-form-field-infix {
+    border-top: none;
+    padding-top: .1375em;
+}
+
+.mat-form-field-wrapper {
+    padding-bottom: 0;
+}
+
+.textArea {
+    // max-height: 300px;
+    resize: none !important;
+}
+
+// .textArea {
+//     resize: vertical;
+// }

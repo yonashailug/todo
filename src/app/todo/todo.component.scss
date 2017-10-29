@@ -1,0 +1,192 @@
+@import "../../_mixins.scss";
+.todos-container {
+    max-width: 410px;
+    margin: 0 auto;
+    margin-top: 50px;
+    background: #fff;
+    box-shadow: -30px 20px 50px 0 rgba(0, 0, 0, 0.1);
+    padding: 30px 32px 0;
+}
+
+ul,
+li {
+    list-style: none;
+    display: block;
+    margin-bottom: 10px;
+    @include flexbox;
+    @include flex-direction(column);
+}
+
+li {
+    color: #777;
+    @include flex-direction(row);
+    @include align-items(flex-start);
+}
+
+.checkbox {
+    margin-right: 24px;
+}
+
+.completed textarea {
+    text-decoration: line-through;
+}
+
+.todos__completed {
+    margin-top: 40px;
+    padding-top: 20px;
+}
+
+.todos__actions,
+.todos__completed {
+    border-top: 1px solid #ddd;
+}
+
+.todos__actions {
+    padding-top: 12px;
+    @include flexbox;
+    @include flex-direction(row);
+    @include flex-wrap(wrap);
+    @include align-items(center);
+    padding-bottom: 12px;
+    margin-bottom: 0;
+}
+
+.todos__actions li svg,
+.action-container li svg {
+    fill: #777;
+}
+
+.icon-delete {
+    align-content: right;
+    height: 18px;
+    width: 18px;
+    border-radius: 11px;
+    background: #999;
+    @include align-items(center);
+    @include justify-content(center);
+    display: none;
+}
+
+.icon-mark-all,
+.icon-delete {
+    cursor: pointer;
+}
+
+.icon-delete svg {
+    fill: #fff;
+}
+
+li:hover .icon-delete {
+    @include flexbox;
+}
+
+.title {
+    font-size: 12px;
+    color: #777;
+}
+
+.title-container {
+    @include flexbox;
+    position: relative;
+    @include align-items(center);
+    cursor: pointer;
+}
+
+.title-container svg {
+    transform: rotate(90deg);
+    margin-right: 20px;
+}
+
+.todos__list {
+    padding-top: 24px;
+}
+
+.todos__list.hide {
+    display: none;
+}
+
+.add-todo {
+    cursor: pointer;
+    color: #999;
+}
+
+.icon-add svg {
+    fill: #999;
+}
+
+.collapsed svg {
+    transform: rotate(-90deg);
+}
+
+.theme-container {
+    @include flexbox;
+    @include flex-direction(row);
+    @include justify-content(center);
+    margin-bottom: 0;
+}
+
+.theme-container li {
+    @include align-items(center);
+    margin-bottom: 0;
+}
+
+.theme {
+    height: 24px;
+    width: 24px;
+    border-radius: 24px;
+    margin-right: 4px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background: transparent;
+    @include flexbox;
+    @include justify-content(center);
+    @include align-items(center);
+}
+
+.todos__actions li {
+    margin-right: 8px;
+}
+
+.theme.theme--green,
+.todos-container.theme--green {
+    background: #a8ffa8;
+}
+
+.theme.theme--blue,
+.todos-container.theme--blue {
+    background: #d9eeff;
+}
+
+.theme.theme--white,
+.todos-container.theme--white {
+    background: white;
+}
+
+// .theme-list {
+//     margin-left: auto;
+// }
+.small {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.icon-mark-all {
+    @include flexbox;
+    @include align-items(center);
+}
+
+.menu-more {
+    margin-left: auto;
+    margin-bottom: 0;
+}
+
+.todos__actions .menu-more {
+    margin-right: 0;
+}
+
+.action-container {
+    padding: 8px 12px 0;
+    margin-bottom: 0;
+}
