@@ -1,7 +1,7 @@
 sudo: false
 dist: trusty
 language: node_js
-install: /bin/true
+install: true
 node_js:
   - '7.0.0'
 addons:
