@@ -1,5 +1,4 @@
 # todo
 Simple Angular 4 todo
 
-[![CI Status]]
-    (https://travis-ci.org/yonashailug/todo)
+[![Build Status](https://img.shields.io/travis/yonashailug/todo/master.svg?label=travis)][travis-badge-url]
