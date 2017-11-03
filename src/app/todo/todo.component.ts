@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChildren, ElementRef, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -35,11 +35,8 @@ export class TodoComponent implements OnInit {
     tasksDataArray: Task[] = [];
     tasksFormGroup: FormGroup;
     selectedTask: Task;
-    public theme: any = {
-        color: 'theme--white'
-    };
     hideTodos: string = "";
-    @ViewChildren('textArea') public textArea: any; 
+    @ViewChildren('textArea') public textArea: QueryList<ElementRef>; 
     
     constructor(private todoService: TodoService, private fb: FormBuilder) {
     }
@@ -132,9 +129,16 @@ export class TodoComponent implements OnInit {
         return this.tasksFormGroup.get('task') as FormArray;
     };
 
-    addUnCompletedTasks(task) {
+    addUnCompletedTasks(task,index) {
+      let textAreas:any = this.textArea.toArray();
         task.controls.push(this.fb.group(new TaskItem()));
-        this.setFocus();
+        this.setFocus(textAreas);
+    }
+    addToCompletedTasks(tasks,item) {
+        tasks.completedTask.controls.push(item);
+    }
+    addToUnCompletedTasks(tasks,item) {
+        tasks.unCompletedTask.controls.push(item);
     }
 
     removeUnCompletedTask(task, index) {
@@ -160,6 +164,7 @@ export class TodoComponent implements OnInit {
         if(event.checked) {
             task.completedTask.push(item);
             this.removeFromUnCompletedTasks(task,index);
+            
             // TODO: update db
             // task.completedTask.push()
         } else {
@@ -171,17 +176,70 @@ export class TodoComponent implements OnInit {
     removeFromUnCompletedTasks(task,index) {
         task.unCompletedTask.controls.splice(index,1);
     }
+
     removeFromCompletedTasks(task,index) {
         task.completedTask.controls.splice(index,1);
     }
+
     changeTheme(task, color: string):void {
         task.controls.color.setValue(color);
     }
-    setFocus() {
-        this.textArea.last.nativeElement.focus();
+
+    setFocus(textAreas):void {   
+      let textAreasCopy = [];   
+      this.textArea.changes.subscribe((data)=>{
+        textAreasCopy = data.toArray();
+      })
+      let ids = [];
+      textAreas.forEach(item => {
+        ids.push(item.nativeElement.id);
+      });
+      setTimeout(() => {
+        textAreasCopy.forEach((item,index)=> {
+          if(ids.indexOf(item.nativeElement.id) == -1) {
+            textAreasCopy[index].nativeElement.focus();
+          }
+        });
+      }, 200)
     }
 
-    hideCompletedTodos(task) {
+    markAllTasksAsCompleted(tasks):void {
+      tasks.unCompletedTask.controls.map((task) => {
+        task.controls.completed.setValue(true);
+      })
+      tasks.unCompletedTask.controls.map((item) => {
+        this.addToCompletedTasks(tasks, item);
+      });
+      let index = tasks.unCompletedTask.controls.length - 1;
+      while(index>=0) {
+        this.removeFromUnCompletedTasks(tasks, index);
+        index = tasks.unCompletedTask.controls.length - 1;
+      }
+    }
+
+    markAllTaslsAsInCompleted(tasks):void{
+      tasks.completedTask.controls.map((task) => {
+        task.controls.completed.setValue(false);
+      })
+      tasks.completedTask.controls.map((item) => {
+        this.addToUnCompletedTasks(tasks, item);
+      });
+      let index = tasks.completedTask.controls.length - 1;
+      while(index>=0) {
+        this.removeFromCompletedTasks(tasks, index);
+        index = tasks.completedTask.controls.length - 1;
+      }
+    }
+
+    deleteCompletedItems(tasks):void {
+      let index = tasks.completedTask.controls.length - 1;
+      while(index>=0) {
+        this.removeFromCompletedTasks(tasks, index);
+        index = tasks.completedTask.controls.length - 1;
+      }
+    }
+
+    hideCompletedTodos(task):void {
         this.hideTodos != task.id.value? this.hideTodos = task.id.value : this.hideTodos = "";
     }
 }

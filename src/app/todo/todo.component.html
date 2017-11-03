@@ -3,11 +3,10 @@
     <form [formGroup]="tasksFormGroup">
         <div class="add-new-task-wrapper">
             <span (click)="addNewTask()">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
-                                </svg>
-                                
-                            </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+                </svg> 
+            </span>
         </div>
         <div formArrayName="tasks" class="todos-wrapper">
             <div *ngFor="let task of tasks?.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="task?.controls?.color?.value">
@@ -16,16 +15,15 @@
                         <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(task?.controls,item, x,$event)">
                         </mat-checkbox>
                         <mat-input-container>
-                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ item?.controls?.title?.value }}" (change)="changeTask(task, item.controls)">
-                                                    </textarea>
+                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ item?.controls?.title?.value }}" (change)="changeTask(task, item.controls)"></textarea>
                         </mat-input-container>
-                        <span class="icon-delete" (click)="removeUnCompletedTask(task?.controls, i)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
-                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                                        </svg>
-                                    </span>
+                        <span class="icon-delete" (click)="removeUnCompletedTask(task?.controls, x)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            </svg>
+                        </span>
                     </li>
-                    <li (click)="addUnCompletedTasks(task?.controls?.unCompletedTask)" class="add-todo">
+                    <li (click)="addUnCompletedTasks(task?.controls?.unCompletedTask, i)" class="add-todo">
                         <span class="icon-add checkbox">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -85,7 +83,7 @@
                             </button>
                         <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before">
                             <ul class="action-container">
-                                <li (click)="markAllAsCompleted()" class="icon-mark-all" *ngIf="task?.controls.unCompletedTask.controls.length>0">
+                                <li (click)="markAllTasksAsCompleted(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.unCompletedTask.controls.length>0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                                             <path d="M0 0h48v48H0z" fill="none"/>
                                             <path d="M36 14l-2.83-2.83-12.68 12.69 2.83 2.83L36 14zm8.49-2.83L23.31 32.34 14.97 24l-2.83 2.83L23.31 38l24-24-2.82-2.83zM.83 26.83L12 38l2.83-2.83L3.66 24 .83 26.83z"/>
@@ -93,13 +91,13 @@
                                             Check Items
                                         </span>
                                 </li>
-                                <li (click)="markAllAsInCompleted()" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
+                                <li (click)="markAllTaslsAsInCompleted(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
                                     <span class="small">
                                             Uncheck Items
                                         </span>
                                 </li>
-                                <li (click)="deleteCompletedItems()" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
+                                <li (click)="deleteCompletedItems(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                         </svg>
