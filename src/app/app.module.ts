@@ -9,6 +9,7 @@ import { DragulaModule } from 'ng2-dragula';
 
 import { AppComponent } from './app.component';
 import { TodoComponent } from './todo/todo.component';
+import { TodoService } from './todo/todo.service';
 
 
 const routes: Routes = [
@@ -46,7 +47,7 @@ const routes: Routes = [
   ],
   exports:[],
   providers: [
-    
+    TodoService
   ],
   bootstrap: [AppComponent]
 })
