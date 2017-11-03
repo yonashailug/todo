@@ -1,10 +1,11 @@
-import { TodoService } from './todo.service';
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule, MatMenuModule } from '@angular/material';
 import { HttpModule } from '@angular/http';
 
 import { TodoComponent } from './todo.component';
+import { TodoService } from './todo.service';
 
 describe('TodoComponent', () => {
   let component: TodoComponent;
