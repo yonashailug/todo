@@ -1,7 +1,6 @@
 sudo: false
 dist: trusty
 language: node_js
-install: /bin/true
 node_js:
   - '7.0.0'
 addons:
@@ -19,6 +18,3 @@ before_script:
 - npm install -g @angular/cli
 - npm install
 - ng build
-script: 
-   - sudo mvn clean package
-   - sudo mvn install
