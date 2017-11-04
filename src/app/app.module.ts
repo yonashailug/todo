@@ -11,20 +11,19 @@ import { AppComponent } from './app.component';
 import { TodoComponent } from './todo/todo.component';
 import { TodoService } from './todo/todo.service';
 
-
 const routes: Routes = [
   {
-    path: '', 
-    redirectTo: 'todo', 
+    path: '',
+    redirectTo: 'todo',
     pathMatch: 'full'
-  },{
+  }, {
     path: 'home',
     component: AppComponent
-  },{
+  }, {
     path: 'todo',
     component: TodoComponent
   }
-]
+];
 
 @NgModule({
   declarations: [
@@ -47,7 +46,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     DragulaModule
   ],
-  exports:[],
+  exports: [],
   providers: [
     TodoService
   ],

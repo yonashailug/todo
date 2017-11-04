@@ -1,4 +1,3 @@
-
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule, MatMenuModule } from '@angular/material';
@@ -15,7 +14,7 @@ describe('TodoComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ TodoComponent ],
       imports: [
-        FormsModule, 
+        FormsModule,
         ReactiveFormsModule,
         MatCheckboxModule,
         MatMenuModule,

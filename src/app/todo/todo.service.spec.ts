@@ -14,4 +14,7 @@ describe('TodoService', () => {
   it('should be created', inject([TodoService], (service: TodoService) => {
     expect(service).toBeTruthy();
   }));
+  it('should return ', inject([TodoService], (service: TodoService) => {
+    expect(service).toBeTruthy();
+  }));
 });

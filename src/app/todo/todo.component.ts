@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChildren, ElementRef, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { TodoService } from './todo.service';
-import { Task, TaskItem } from './todo-model';
+import { Task, TaskItem } from './todo.model';
 
 @Component({
     selector: 'app-todo',
@@ -13,20 +13,15 @@ import { Task, TaskItem } from './todo-model';
     styleUrls: ['./todo.component.scss'],
     animations: [
         trigger('fadeIn', [
-    
-          transition(':enter', [ 
-            
-            style({opacity:0}),
-            animate('0.5s ease', style({opacity:1})) 
-    
+          transition(':enter', [
+            style({opacity: 0}),
+            animate('0.5s ease', style({opacity: 1}))
           ]),
-          transition(':leave', [ 
-            style({opacity:1}),
-            animate('0.15s ease', style({opacity:0})) 
-    
+          transition(':leave', [
+            style({opacity: 1}),
+            animate('0.15s ease', style({opacity: 0}))
           ])
         ])
-    
       ]
 })
 export class TodoComponent implements OnInit {
@@ -35,32 +30,34 @@ export class TodoComponent implements OnInit {
     tasksDataArray: Task[] = [];
     tasksFormGroup: FormGroup;
     selectedTask: Task;
-    hideTodos: string = "";
-    @ViewChildren('textArea') public textArea: QueryList<ElementRef>; 
-    
+    hideTodos: string = '';
+    nameChangeLog: string[] = [];
+    @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
+
     constructor(private todoService: TodoService, private fb: FormBuilder) {}
 
     ngOnInit() {
         this.getTasks();
         this.createForm();
+        this.logChange();
     }
 
-    createForm():void{
+    createForm(): void {
         this.tasksFormGroup = this.fb.group({
             tasks: this.fb.array([]),
         });
     }
 
-    getTasks():void {
+    getTasks(): void {
         this.tasksData = this.todoService.getData()
-                        .finally(() => {console.log("data fetched!")});
-        this.tasksData.subscribe((tasks: Task[]) => {  
+                        .finally(() => { console.log('data fetched!'); });
+        this.tasksData.subscribe((tasks: Task[]) => {
             this.tasksDataArray = tasks;
             this.setTasks(this.tasksDataArray);
-        })        
+        });
     }
 
-    setTasks(tasks: Task[]):void {
+    setTasks(tasks: Task[]): void {
         const tasksFGs = tasks.map(task => this.fb.group({
             id: task.id,
             color: task.color,
@@ -74,7 +71,7 @@ export class TodoComponent implements OnInit {
         this.tasksFormGroup.setControl('tasks', tasksFormArray);
     }
 
-    addEmptyTask(task: Task):void {
+    addEmptyTask(task: Task): void {
         const tasksFG = this.fb.group({
             id: null,
             color: 'theme--white',
@@ -83,15 +80,15 @@ export class TodoComponent implements OnInit {
             hideCheckedItems: false,
             unCompletedTask: this.setUncompletedTaskItems([]),
             completedTask: this.setCompletedTaskItems([])
-        })
-        let tasksFormArrays = this.tasks;
+        });
+        const tasksFormArrays = this.tasks;
         tasksFormArrays.push(tasksFG);
-        this.tasksFormGroup.setControl('tasks', tasksFormArrays);  
+        this.tasksFormGroup.setControl('tasks', tasksFormArrays);
         // TODO: update db
     }
 
-    makeATaskCopy(task, index) {
-      let copyTask = task.getRawValue();
+    makeATaskCopy(task, index): void {
+      const copyTask = task.getRawValue();
       const tasksFG = this.fb.group({
           id: copyTask.id + 1,
           color: copyTask.color,
@@ -100,146 +97,146 @@ export class TodoComponent implements OnInit {
           hideCheckedItems: copyTask.hideCheckedItems,
           unCompletedTask: this.setUncompletedTaskItems(copyTask.unCompletedTask),
           completedTask: this.setCompletedTaskItems(copyTask.completedTask)
-      })
-      let tasksFormArrays = this.tasks;
-      tasksFormArrays.push(tasksFG);
+      });
+      const tasksFormArrays = this.tasks;
+      tasksFormArrays.insert(index, tasksFG);
       this.tasksFormGroup.setControl('tasks', tasksFormArrays);
       // TODO: update db
     }
 
-    addNewTask():void {
-        this.addEmptyTask(new Task()); 
+    addNewTask(): void {
+        this.addEmptyTask(new Task());
     }
 
-    setTaskItems(taskItems: TaskItem[]):FormArray {
+    setTaskItems(taskItems: TaskItem[]): FormArray {
         const taskItemsFGs = taskItems.map(task => this.fb.group(task));
         const taskItemsFormArray = this.fb.array(taskItemsFGs);
         return taskItemsFormArray;
     }
 
-    setUncompletedTaskItems(taskItems: TaskItem[]):FormArray {
-        let unCompletedTask:TaskItem[]  = [];
+    setUncompletedTaskItems(taskItems: TaskItem[]): FormArray {
+        const unCompletedTask: TaskItem[] = [];
         taskItems.forEach((task) => {
-            if(!task.completed) {
-                unCompletedTask.push(task);
+            if (!task.completed) {
+              unCompletedTask.push(task);
             }
-        })
+        });
         const taskItemsFGs = unCompletedTask.map(task => this.fb.group(task));
         const taskItemsFormArray = this.fb.array(taskItemsFGs);
         return taskItemsFormArray;
     }
 
-    setCompletedTaskItems(taskItems: TaskItem[]):FormArray {
-        let completedTask:TaskItem[]  = [];
+    setCompletedTaskItems(taskItems: TaskItem[]): FormArray {
+        const completedTask: TaskItem[]  = [];
         taskItems.forEach((task) => {
-            if(task.completed) {
+            if (task.completed) {
                 completedTask.push(task);
             }
-        })
+        });
         const taskItemsFGs = completedTask.map(task => this.fb.group(task));
         const taskItemsFormArray = this.fb.array(taskItemsFGs);
         return taskItemsFormArray;
     }
-    
+
     get tasks(): FormArray {
         return this.tasksFormGroup.get('tasks') as FormArray;
-    };
+    }
 
     get task(): FormArray {
         return this.tasksFormGroup.get('task') as FormArray;
-    };
+    }
 
-    addUnCompletedTasks(task,index):void {
-        let textAreas:any = this.textArea.toArray();
+    addUnCompletedTasks(task, index): void {
+        const textAreas: any = this.textArea.toArray();
         task.controls.push(this.fb.group(new TaskItem()));
         this.setFocus(textAreas);
         // TODO: update db
     }
 
-    addToCompletedTasks(tasks,item):void {
+    addToCompletedTasks(tasks, item): void {
         tasks.completedTask.controls.push(item);
         // TODO: update db
     }
 
-    addToUnCompletedTasks(tasks,item):void {
+    addToUnCompletedTasks(tasks, item): void {
         tasks.unCompletedTask.controls.push(item);
         // TODO: update db
     }
 
-    removeUnCompletedTask(task, index):void {
-        this.removeFromUnCompletedTasks(task,index);
+    removeUnCompletedTask(task, index): void {
+        this.removeFromUnCompletedTasks(task, index);
     }
 
-    removeCompletedTask(task, index):void {
-        this.removeFromCompletedTasks(task,index);
+    removeCompletedTask(task, index): void {
+        this.removeFromCompletedTasks(task, index);
     }
 
-    removeItem(event,task,index):void {
-      if(event.keyCode == 8) {
-        if(!event.srcElement.value) {
-          this.removeUnCompletedTask(task,index);
+    removeItem(event, task, index): void {
+      if (event.keyCode === 8) {
+        if (!event.srcElement.value) {
+          this.removeUnCompletedTask(task, index);
         }
       }
     }
 
-    changeTask(task, item):void {
-        // TODO: save to db   
-        if(!item.id.value) {
-        // TODO: create new 
+    changeTask(task, item): void {
+        // TODO: save to db
+        if (!item.id.value) {
+        // TODO: create new
         return;
         }
         // TODO: update new Task Object
-        let updateTaskRef: Task = new Task();
+        const updateTaskRef: Task = new Task();
         // console.log(updateTaskRef)
     }
 
-    markTaskAsCompleted(task,item,index, event):void {
-        if(event.checked) {
+    markTaskAsCompleted(task, item, index, event): void {
+        if (event.checked) {
             task.completedTask.push(item);
-            this.removeFromUnCompletedTasks(task,index);
+            this.removeFromUnCompletedTasks(task, index);
             // TODO: update db
             // task.completedTask.push()
         } else {
             task.unCompletedTask.push(item);
-            this.removeFromCompletedTasks(task,index);
+            this.removeFromCompletedTasks(task, index);
             // TODO: update db
         }
     }
 
-    removeFromUnCompletedTasks(task,index):void {
-        task.unCompletedTask.controls.splice(index,1);
+    removeFromUnCompletedTasks(task, index): void {
+        task.unCompletedTask.controls.splice(index, 1);
         // TODO: update db
     }
 
-    removeFromCompletedTasks(task,index):void {
-        task.completedTask.controls.splice(index,1);
+    removeFromCompletedTasks(task, index): void {
+        task.completedTask.controls.splice(index, 1);
         // TODO: update db
     }
 
-    changeTheme(task, color: string):void {
+    changeTheme(task, color: string): void {
         task.controls.color.setValue(color);
         // TODO: update db
     }
 
-    setFocus(textAreas):void {   
-      let textAreasCopy = [];   
-      this.textArea.changes.subscribe((data)=>{
+    setFocus(textAreas): void {
+      let textAreasCopy = [];
+      this.textArea.changes.subscribe((data) => {
         textAreasCopy = data.toArray();
-      })
-      let ids = [];
+      });
+      const ids = [];
       textAreas.forEach(item => {
         ids.push(item.nativeElement.id);
       });
       setTimeout(() => {
-        textAreasCopy.forEach((item,index)=> {
-          if(ids.indexOf(item.nativeElement.id) == -1) {
+        textAreasCopy.forEach((item, index) => {
+          if (ids.indexOf(item.nativeElement.id) === -1) {
             textAreasCopy[index].nativeElement.focus();
           }
         });
       }, 200);
     }
 
-    markAllTasksAsCompleted(tasks):void {
+    markAllTasksAsCompleted(tasks): void {
       tasks.unCompletedTask.controls.map((task) => {
         task.controls.completed.setValue(true);
       });
@@ -247,14 +244,14 @@ export class TodoComponent implements OnInit {
         this.addToCompletedTasks(tasks, item);
       });
       let index = tasks.unCompletedTask.controls.length - 1;
-      while(index>=0) {
+      while (index >= 0) {
         this.removeFromUnCompletedTasks(tasks, index);
         index = tasks.unCompletedTask.controls.length - 1;
       }
       // TODO: update db
     }
 
-    markAllTaslsAsInCompleted(tasks):void{
+    markAllTaslsAsInCompleted(tasks): void {
       tasks.completedTask.controls.map((task) => {
         task.controls.completed.setValue(false);
       });
@@ -262,41 +259,44 @@ export class TodoComponent implements OnInit {
         this.addToUnCompletedTasks(tasks, item);
       });
       let index = tasks.completedTask.controls.length - 1;
-      while(index>=0) {
+      while (index >= 0) {
         this.removeFromCompletedTasks(tasks, index);
         index = tasks.completedTask.controls.length - 1;
       }
       // TODO: update db
     }
 
-    deleteCompletedItems(tasks):void {
+    deleteCompletedItems(tasks): void {
       let index = tasks.completedTask.controls.length - 1;
-      while(index>=0) {
+      while (index >= 0) {
         this.removeFromCompletedTasks(tasks, index);
         index = tasks.completedTask.controls.length - 1;
       }
       // TODO: update db
     }
 
-    deleteTask(task, index):void {
+    deleteTask(task, index): void {
       this.tasks.removeAt(index);
        // TODO: update db
     }
 
-    makeTaskCopy(task,index):void {
-      console.log(task);
-      // this.tasks.insert(index,this.makeATaskCopy(task.controls));
-       // TODO: update db
-    }
-
-    hideCompletedTodos(task):void {
-      if(task.hideCheckedItems.value) {
+    hideCompletedTodos(task): void {
+      if (task.hideCheckedItems.value) {
         task.hideCheckedItems.setValue(false);
         // TODO: update db
-      } 
-      else {
+      } else {
         task.hideCheckedItems.setValue(true);
          // TODO: update db
       }
+    }
+
+    logChange() {
+      const nameControl = this.tasksFormGroup.get('tasks');
+      nameControl.valueChanges.forEach(
+        (value: string) => {
+          console.log(value);
+          this.nameChangeLog.push(value);
+        }
+      );
     }
 }

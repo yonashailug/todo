@@ -41,3 +41,35 @@ body {
 // .textArea {
 //     resize: vertical;
 // }
+.theme--white .mat-checkbox-checkmark-path {
+    stroke: #fff !important;
+}
+
+.theme--cyan .mat-checkbox-checkmark-path {
+    stroke: #a7ffeb !important;
+}
+
+.theme--yellow-light .mat-checkbox-checkmark-path {
+    stroke: #ffff8d !important;
+}
+
+.theme--red-light .mat-checkbox-checkmark-path {
+    stroke: #ff8a80 !important;
+}
+
+.theme--blue .mat-checkbox-checkmark-path {
+    stroke: #d9eeff !important;
+}
+
+.theme--green .mat-checkbox-checkmark-path {
+    stroke: #a8ffa8 !important;
+}
+
+.mat-menu-content {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.mat-menu-panel {
+    background: transparent !important;
+}

@@ -1,19 +1,17 @@
 <div class="container">
+    <div class="add-new-task-wrapper">
+        <span (click)="addNewTask()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+            </svg>
+        </span>
+    </div>
     <form [formGroup]="tasksFormGroup">
-        <div class="add-new-task-wrapper">
-            <span (click)="addNewTask()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
-                </svg>
-            </span>
-        </div>
         <div formArrayName="tasks" class="todos-wrapper">
             <mat-card *ngFor="let task of tasks?.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="task?.controls?.color?.value">
-                <mat-card-title>
-                    <mat-input-container floatPlaceholder="never">
-                        <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ task?.controls?.name?.value }}" (change)="changeTask(task, task.controls)" placeholder="Title"></textarea>
-                    </mat-input-container>
-                </mat-card-title>
+                <mat-input-container floatPlaceholder="never" class="form-group">
+                    <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ task?.controls?.name?.value }}" (change)="changeTask(task, task.controls)" placeholder="Title"></textarea>
+                </mat-input-container>
                 <ul class="todos" formArrayName="unCompletedTask">
                     <li *ngFor="let item of task?.controls?.unCompletedTask?.controls; let x = index;" [formGroupName]="x">
                         <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(task?.controls,item, x,$event)">
@@ -88,7 +86,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
                         <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before">
-                            <ul class="action-container">
+                            <ul class="action-container" [ngClass]="task?.controls?.color?.value">
                                 <li (click)="markAllTasksAsCompleted(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.unCompletedTask.controls.length>0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                                         <path d="M0 0h48v48H0z" fill="none"/>

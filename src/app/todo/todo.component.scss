@@ -1,16 +1,13 @@
 @import "../../_mixins.scss";
 .container {
-    margin: 0 20px;
+    margin: 0 20px 100px;
+    @include justify-content(center);
 }
 
 .container,
 .todos-wrapper {
     @include flexbox;
     @include flex-wrap(wrap);
-}
-
-.container {
-    @include justify-content(center);
 }
 
 .todos-wrapper {
@@ -20,11 +17,8 @@
 .todos-container {
     max-width: 280px;
     min-width: 280px;
-    margin: 20px 0px 50px;
-    margin-right: 50px;
+    margin: 20px;
     background: #fff;
-    // box-shadow: -30px 20px 50px 0 rgba(0, 0, 0, 0.1);
-    padding: 30px 32px 0;
 }
 
 ul,
@@ -51,13 +45,12 @@ li {
 }
 
 .todos__completed {
-    margin-top: 40px;
     padding-top: 20px;
 }
 
 .todos__actions,
 .todos__completed {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .todos__actions {
@@ -66,7 +59,6 @@ li {
     @include flex-direction(row);
     @include flex-wrap(wrap);
     @include align-items(center);
-    padding-bottom: 12px;
     margin-bottom: 0;
 }
 
@@ -126,11 +118,11 @@ li:hover .icon-delete {
 
 .add-todo {
     cursor: pointer;
-    color: #999;
+    color: rgba(0, 0, 0, 0.4);
 }
 
 .icon-add svg {
-    fill: #999;
+    fill: rgba(0, 0, 0, 0.5);
 }
 
 .collapsed svg {
@@ -155,7 +147,7 @@ li:hover .icon-delete {
     border-radius: 24px;
     margin-right: 4px;
     cursor: pointer;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(0, 0, 0, 0.15);
     background: transparent;
     @include flexbox;
     @include justify-content(center);
@@ -166,33 +158,27 @@ li:hover .icon-delete {
     margin-right: 8px;
 }
 
-.theme.theme--green,
-.todos-container.theme--green {
+.theme--green {
     background: #a8ffa8;
 }
 
-.theme.theme--blue,
-.todos-container.theme--blue {
+.theme--blue {
     background: #d9eeff;
 }
 
-.theme.theme--red-light,
-.todos-container.theme--red-light {
+.theme--red-light {
     background: #ff8a80;
 }
 
-.theme.theme--yellow-light,
-.todos-container.theme--yellow-light {
+.theme--yellow-light {
     background: #ffff8d;
 }
 
-.theme.theme--cyan,
-.todos-container.theme--cyan {
+.theme--cyan {
     background: #a7ffeb;
 }
 
-.theme.theme--white,
-.todos-container.theme--white {
+.theme--white {
     background: white;
 }
 
@@ -221,7 +207,7 @@ li:hover .icon-delete {
 }
 
 .action-container {
-    padding: 8px 12px 0;
+    padding: 8px 12px 8px;
     margin-bottom: 0;
 }
 
@@ -243,10 +229,16 @@ li:hover .icon-delete {
     display: inline-block;
 }
 
-.name,
-textarea.name[placeholder] {
-    font-size: 16px;
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group .name {
+    font-size: 14px;
     font-weight: 700;
     color: #222;
-    margin-bottom: 20px;
+}
+
+.mat-input-element {
+    color: rgba(0, 0, 0, 0.54);
 }

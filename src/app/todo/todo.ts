@@ -5,12 +5,18 @@ export class Todo {
     public completed: boolean;
     public archived: boolean;
 
+    public static fromObject(obj): Todo {
+        const todo: Todo = new Todo();
+        Object.assign(todo, obj);
+        return todo;
+    }
+
     getId(): number {
         return this.id;
     }
     setId(value: number) {
         this.id = value;
-    } 
+    }
     getUserId(): number {
         return this.userId;
     }
@@ -34,13 +40,5 @@ export class Todo {
     }
     setArchived(value: boolean) {
         this.archived = value;
-    }
-
-    public static fromObject(obj): Todo {
-
-        let todo: Todo = new Todo();
-        Object.assign(todo, obj);
-        return todo;
-
     }
 }
