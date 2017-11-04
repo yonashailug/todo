@@ -1,20 +1,24 @@
 export class Task {
     id:number = 0;
-    color:string= "theme--white";
-    task: TaskItem[];
-  }
+    color:string= "";
+    name:string = "";
+    task:TaskItem[];
+    hideCheckedItems:boolean = false;
+}
     
 export class TaskItem {
-id: number = 0;
-completed:boolean = false;
-archived:boolean  = false;
-title:string = '';
+    id: number = 0;
+    completed:boolean = false;
+    archived:boolean  = false;
+    title:string = '';
 }
     
 export const tasks: Task[] = [
     {
         "id": 1,
         "color": "theme--white",
+        "name": "Today's task",
+        "hideCheckedItems": false,
         "task": [{
             "archived": false,
             "id": 1,
@@ -29,6 +33,8 @@ export const tasks: Task[] = [
     }, {
         "id": 2,
         "color": "theme--blue",
+        "name": "yesterday's task",
+        "hideCheckedItems": true,
         "task": [{
             "archived": false,
             "id": 1,
@@ -37,7 +43,7 @@ export const tasks: Task[] = [
         }, {
             "archived": false,
             "id": 2,
-            "title": "Jenkins",
+            "title": "Travis CI",
             "completed": true
         }]
     }

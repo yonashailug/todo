@@ -1,21 +1,25 @@
 <div class="container">
-
     <form [formGroup]="tasksFormGroup">
         <div class="add-new-task-wrapper">
             <span (click)="addNewTask()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
-                </svg> 
+                </svg>
             </span>
         </div>
         <div formArrayName="tasks" class="todos-wrapper">
-            <div *ngFor="let task of tasks?.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="task?.controls?.color?.value">
+            <mat-card *ngFor="let task of tasks?.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="task?.controls?.color?.value">
+                <mat-card-title>
+                    <mat-input-container floatPlaceholder="never">
+                        <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ task?.controls?.name?.value }}" (change)="changeTask(task, task.controls)" placeholder="Title"></textarea>
+                    </mat-input-container>
+                </mat-card-title>
                 <ul class="todos" formArrayName="unCompletedTask">
                     <li *ngFor="let item of task?.controls?.unCompletedTask?.controls; let x = index;" [formGroupName]="x">
                         <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(task?.controls,item, x,$event)">
                         </mat-checkbox>
                         <mat-input-container>
-                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ item?.controls?.title?.value }}" (change)="changeTask(task, item.controls)"></textarea>
+                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ item?.controls?.title?.value }}" (change)="changeTask(task, item.controls)" (keydown)="removeItem($event,task?.controls, x)"></textarea>
                         </mat-input-container>
                         <span class="icon-delete" (click)="removeUnCompletedTask(task?.controls, x)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
@@ -24,22 +28,19 @@
                         </span>
                     </li>
                     <li (click)="addUnCompletedTasks(task?.controls?.unCompletedTask, i)" class="add-todo">
-                        <span class="icon-add checkbox">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                    <path d="M0 0h24v24H0z" fill="none"/>
-                                </svg>
-                                </span>
+                        <span class="icon-add checkbox"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+                        </span>
                         <span class="icon-add">List item</span>
                     </li>
                 </ul>
                 <ul class="todos todos__completed" *ngIf="task?.controls.completedTask.controls.length>0">
-                    <div class="title-container" [ngClass]="{'collapsed': hideTodos == task?.controls?.id?.value }" (click)="hideCompletedTodos(task?.controls)">
+                    <div class="title-container" [ngClass]="{'collapsed': task?.controls?.hideCheckedItems?.value}" (click)="hideCompletedTodos(task?.controls)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                         <div class="title" *ngIf="task?.controls.completedTask.controls.length == 1">{{task?.controls.completedTask.controls.length}} Completed item</div>
                         <div class="title" *ngIf="task?.controls.completedTask.controls.length > 1">{{task?.controls.completedTask.controls.length}} Completed items</div>
                     </div>
-                    <div class="todos__list" [ngClass]="{'hide': hideTodos == task?.controls?.id?.value}">
+                    <div class="todos__list" [ngClass]="{'hide': task?.controls?.hideCheckedItems?.value}">
                         <div formArrayName="completedTask" [@fadeIn] *ngFor="let item of task?.controls.completedTask.controls; let i = index;">
                             <li [formGroupName]="i" class="completed">
                                 <mat-checkbox color="primary" class="checkbox" checked="checked" (change)="markTaskAsCompleted(task?.controls,item, i,$event)">
@@ -65,51 +66,61 @@
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
                             </li>
-                            <li class="theme theme--green" (click)="changeTheme(task, 'theme--green')">
-                                <svg *ngIf="task?.controls.color.value == 'theme--green'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                            <li class="theme theme--cyan" (click)="changeTheme(task, 'theme--cyan')">
+                                <svg *ngIf="task?.controls.color.value == 'theme--cyan'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
                             </li>
-                            <li class="theme theme--blue" (click)="changeTheme(task, 'theme--blue')">
-                                <svg *ngIf="task?.controls.color.value == 'theme--blue'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                            <li class="theme theme--red-light" (click)="changeTheme(task, 'theme--red-light')">
+                                <svg *ngIf="task?.controls.color.value == 'theme--red-light'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                                </svg>
+                            </li>
+                            <li class="theme theme--yellow-light" (click)="changeTheme(task, 'theme--yellow-light')">
+                                <svg *ngIf="task?.controls.color.value == 'theme--yellow-light'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
                             </li>
                         </ul>
                     </div>
-                    <li class="menu-more" *ngIf="task?.controls.unCompletedTask.controls.length || task?.controls.completedTask.controls.length">
+                    <li class="menu-more">
                         <button mat-icon-button [matMenuTriggerFor]="menuMore">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            </button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        </button>
                         <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before">
                             <ul class="action-container">
                                 <li (click)="markAllTasksAsCompleted(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.unCompletedTask.controls.length>0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
-                                            <path d="M0 0h48v48H0z" fill="none"/>
-                                            <path d="M36 14l-2.83-2.83-12.68 12.69 2.83 2.83L36 14zm8.49-2.83L23.31 32.34 14.97 24l-2.83 2.83L23.31 38l24-24-2.82-2.83zM.83 26.83L12 38l2.83-2.83L3.66 24 .83 26.83z"/>
-                                        </svg><span class="small">
-                                            Check Items
-                                        </span>
+                                        <path d="M0 0h48v48H0z" fill="none"/>
+                                        <path d="M36 14l-2.83-2.83-12.68 12.69 2.83 2.83L36 14zm8.49-2.83L23.31 32.34 14.97 24l-2.83 2.83L23.31 38l24-24-2.82-2.83zM.83 26.83L12 38l2.83-2.83L3.66 24 .83 26.83z"/>
+                                    </svg><span class="small">Check Items</span>
                                 </li>
                                 <li (click)="markAllTaslsAsInCompleted(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-                                    <span class="small">
-                                            Uncheck Items
-                                        </span>
+                                    <span class="small">Uncheck Items</span>
                                 </li>
                                 <li (click)="deleteCompletedItems(task?.controls)" class="icon-mark-all" *ngIf="task?.controls.completedTask.controls.length > 0">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                         </svg>
-                                    <span class="small">
-                                            Delete checked Items
-                                        </span>
+                                    <span class="small">Delete checked Items</span>
+                                </li>
+                                <li (click)="deleteTask(task,i)" class="icon-mark-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        <path d="M0 0h24v24H0z" fill="none"/>
+                                    </svg>
+                                    <span class="small">Delete</span>
+                                </li>
+                                <li (click)="makeATaskCopy(task,i)" class="icon-mark-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                    <span class="small">Make a copy</span>
                                 </li>
                             </ul>
                         </mat-menu>
                     </li>
                 </ul>
-            </div>
+            </mat-card>
         </div>
     </form>
 </div>

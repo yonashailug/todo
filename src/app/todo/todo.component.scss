@@ -7,6 +7,9 @@
 .todos-wrapper {
     @include flexbox;
     @include flex-wrap(wrap);
+}
+
+.container {
     @include justify-content(center);
 }
 
@@ -20,7 +23,7 @@
     margin: 20px 0px 50px;
     margin-right: 50px;
     background: #fff;
-    box-shadow: -30px 20px 50px 0 rgba(0, 0, 0, 0.1);
+    // box-shadow: -30px 20px 50px 0 rgba(0, 0, 0, 0.1);
     padding: 30px 32px 0;
 }
 
@@ -173,6 +176,21 @@ li:hover .icon-delete {
     background: #d9eeff;
 }
 
+.theme.theme--red-light,
+.todos-container.theme--red-light {
+    background: #ff8a80;
+}
+
+.theme.theme--yellow-light,
+.todos-container.theme--yellow-light {
+    background: #ffff8d;
+}
+
+.theme.theme--cyan,
+.todos-container.theme--cyan {
+    background: #a7ffeb;
+}
+
 .theme.theme--white,
 .todos-container.theme--white {
     background: white;
@@ -207,7 +225,28 @@ li:hover .icon-delete {
     margin-bottom: 0;
 }
 
+.add-new-task-wrapper {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    z-index: 1;
+    @include flexbox;
+    @include justify-content(center);
+    padding: 8px 0;
+    box-shadow: -30px -20px 50px 0 rgba(0, 0, 0, 0.1);
+}
+
 .add-new-task-wrapper span {
     cursor: pointer;
     display: inline-block;
+}
+
+.name,
+textarea.name[placeholder] {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 20px;
 }

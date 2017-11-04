@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule,MatMenuModule, MatButtonModule, MatCheckboxModule} from '@angular/material';
+import { MatInputModule, MatListModule, MatCardModule, MatMenuModule, MatButtonModule, MatCheckboxModule} from '@angular/material';
 import { Routes, RouterModule } from '@angular/router';
 import { DragulaModule } from 'ng2-dragula';
 
@@ -42,6 +42,8 @@ const routes: Routes = [
     MatButtonModule,
     MatMenuModule,
     MatCheckboxModule,
+    MatCardModule,
+    MatListModule,
     RouterModule.forRoot(routes),
     DragulaModule
   ],
