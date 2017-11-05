@@ -1,48 +1,48 @@
-export class Task {
+export class Todo {
     public id: number = 0;
     public color: string = '';
     public name: string = '';
-    public task: TaskItem[];
+    public tasks: Task[];
     public hideCheckedItems: boolean = false;
 }
-export class TaskItem {
+export class Task {
     public id: number = 0;
     public completed: boolean = false;
     public archived: boolean  = false;
     public title: string = '';
 }
-export const tasks: Task[] = [
+export const todos: Todo[] = [
     {
         'id': 1,
         'color': 'theme--white',
         'name': 'Todays task',
         'hideCheckedItems': false,
-        'task': [{
-            'archived': false,
+        'tasks': [{
             'id': 1,
-            'title': 'Express JS',
-            'completed': true
-        }, {
+            'completed': true,
             'archived': false,
+            'title': 'Express JS'
+        }, {
             'id': 2,
-            'title': 'Node JS',
-            'completed': false
+            'completed': false,
+            'archived': false,
+            'title': 'Node JS'
         }]
     }, {
         'id': 2,
-        'color': 'theme--blue',
+        'color': 'theme--yellow-ligh',
         'name': 'yesterdays task',
         'hideCheckedItems': true,
-        'task': [{
-            'archived': false,
+        'tasks': [{
             'id': 1,
-            'title': 'Hapi JS',
-            'completed': false
-        }, {
+            'completed': false,
             'archived': false,
+            'title': 'Hapi JS',
+        }, {
             'id': 2,
+            'completed': true,
+            'archived': false,
             'title': 'Travis CI',
-            'completed': true
         }]
     }
 ];

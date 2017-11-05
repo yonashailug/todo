@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { TodoService } from './todo.service';
-import { Task, TaskItem } from './todo.model';
+import { Todo, Task } from './todo.model';
 
 @Component({
     selector: 'app-todo',
@@ -26,140 +26,136 @@ import { Task, TaskItem } from './todo.model';
 })
 export class TodoComponent implements OnInit {
 
-    tasksData: Observable<Task[]>;
-    tasksDataArray: Task[] = [];
-    tasksFormGroup: FormGroup;
+    todos: Observable<Todo[]>;
+    todoArray: Todo[] = [];
+    todosFormGroup: FormGroup;
     selectedTask: Task;
-    hideTodos: string = '';
+    hideTasks: string = '';
     nameChangeLog: string[] = [];
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
 
     constructor(private todoService: TodoService, private fb: FormBuilder) {}
 
     ngOnInit() {
-        this.getTasks();
+        this.getTodos();
         this.createForm();
-        this.logChange();
+        // this.logChange();
     }
 
     createForm(): void {
-        this.tasksFormGroup = this.fb.group({
-            tasks: this.fb.array([]),
+        this.todosFormGroup = this.fb.group({
+            todos: this.fb.array([]),
         });
     }
 
-    getTasks(): void {
-        this.tasksData = this.todoService.getData()
+    getTodos(): void {
+        this.todos = this.todoService.getData()
                         .finally(() => { console.log('data fetched!'); });
-        this.tasksData.subscribe((tasks: Task[]) => {
-            this.tasksDataArray = tasks;
-            this.setTasks(this.tasksDataArray);
+        this.todos.subscribe((todos: Todo[]) => {
+            this.todoArray = todos;
+            this.setTodos(this.todoArray);
         });
     }
 
-    setTasks(tasks: Task[]): void {
-        const tasksFGs = tasks.map(task => this.fb.group({
-            id: task.id,
-            color: task.color,
-            name: task.name,
-            task: this.setTaskItems(task.task),
-            hideCheckedItems: task.hideCheckedItems,
-            unCompletedTask: this.setUncompletedTaskItems(task.task),
-            completedTask: this.setCompletedTaskItems(task.task)
+    setTodos(todos: Todo[]): void {
+        const todoFGs = todos.map(todo => this.fb.group({
+            id: todo.id,
+            color: todo.color,
+            name: todo.name,
+            hideCheckedItems: todo.hideCheckedItems,
+            tasks: this.setTodoTasks(todo.tasks),
+            unCompletedTasks: this.setUncompletedTasks(todo.tasks),
+            completedTasks: this.setCompletedTasks(todo.tasks)
         }));
-        const tasksFormArray = this.fb.array(tasksFGs);
-        this.tasksFormGroup.setControl('tasks', tasksFormArray);
+        const todoArray = this.fb.array(todoFGs);
+        this.todosFormGroup.setControl('todos', todoArray);
     }
 
-    addEmptyTask(task: Task): void {
-        const tasksFG = this.fb.group({
+    addEmptyTodo(todo: Todo): void {
+        const todoFG = this.fb.group({
             id: null,
             color: 'theme--white',
             name: '',
-            task: this.setTaskItems([]),
             hideCheckedItems: false,
-            unCompletedTask: this.setUncompletedTaskItems([]),
-            completedTask: this.setCompletedTaskItems([])
+            tasks: this.setTodoTasks([]),
+            unCompletedTasks: this.setUncompletedTasks([]),
+            completedTasks: this.setCompletedTasks([])
         });
-        const tasksFormArrays = this.tasks;
-        tasksFormArrays.push(tasksFG);
-        this.tasksFormGroup.setControl('tasks', tasksFormArrays);
+        const todoArray = this.todosFA;
+        todoArray.push(todoFG);
+        this.todosFormGroup.setControl('todos', todoArray);
         // TODO: update db
     }
 
-    makeATaskCopy(task, index): void {
-      const copyTask = task.getRawValue();
-      const tasksFG = this.fb.group({
-          id: copyTask.id + 1,
-          color: copyTask.color,
-          name: copyTask.name,
-          task: this.setTaskItems(copyTask.task),
-          hideCheckedItems: copyTask.hideCheckedItems,
-          unCompletedTask: this.setUncompletedTaskItems(copyTask.unCompletedTask),
-          completedTask: this.setCompletedTaskItems(copyTask.completedTask)
+    makeTodoCopy(todo, index): void {
+      const copyTodo = todo.getRawValue();
+      const todoFG = this.fb.group({
+          id: copyTodo.id + 1,
+          color: copyTodo.color,
+          name: copyTodo.name,
+          tasks: this.setTodoTasks(copyTodo.tasks),
+          hideCheckedItems: copyTodo.hideCheckedItems,
+          unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
+          completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
       });
-      const tasksFormArrays = this.tasks;
-      tasksFormArrays.insert(index, tasksFG);
-      this.tasksFormGroup.setControl('tasks', tasksFormArrays);
+      const todoArray = this.todosFA;
+      todoArray.insert(index, todoFG);
+      this.todosFormGroup.setControl('todos', todoArray);
       // TODO: update db
     }
 
-    addNewTask(): void {
-        this.addEmptyTask(new Task());
+    addNewTodo(): void {
+        this.addEmptyTodo(new Todo());
     }
 
-    setTaskItems(taskItems: TaskItem[]): FormArray {
-        const taskItemsFGs = taskItems.map(task => this.fb.group(task));
-        const taskItemsFormArray = this.fb.array(taskItemsFGs);
-        return taskItemsFormArray;
+    setTodoTasks(tasks): FormArray {
+        const taskFGs = tasks.map(task => this.fb.group(task));
+        const taskArray = this.fb.array(taskFGs);
+        return taskArray;
     }
 
-    setUncompletedTaskItems(taskItems: TaskItem[]): FormArray {
-        const unCompletedTask: TaskItem[] = [];
-        taskItems.forEach((task) => {
+    setUncompletedTasks(tasks: Task[]): FormArray {
+        const unCompletedTasks: Task[] = [];
+        tasks.forEach((task) => {
             if (!task.completed) {
-              unCompletedTask.push(task);
+              unCompletedTasks.push(task);
             }
         });
-        const taskItemsFGs = unCompletedTask.map(task => this.fb.group(task));
-        const taskItemsFormArray = this.fb.array(taskItemsFGs);
-        return taskItemsFormArray;
+        const taskFGs = unCompletedTasks.map(task => this.fb.group(task));
+        const taskArray = this.fb.array(taskFGs);
+        return taskArray;
     }
 
-    setCompletedTaskItems(taskItems: TaskItem[]): FormArray {
-        const completedTask: TaskItem[]  = [];
-        taskItems.forEach((task) => {
+    setCompletedTasks(tasks: Task[]): FormArray {
+        const completedTasks: Task[]  = [];
+        tasks.forEach((task) => {
             if (task.completed) {
-                completedTask.push(task);
+              completedTasks.push(task);
             }
         });
-        const taskItemsFGs = completedTask.map(task => this.fb.group(task));
-        const taskItemsFormArray = this.fb.array(taskItemsFGs);
-        return taskItemsFormArray;
+        const taskFGs = completedTasks.map(task => this.fb.group(task));
+        const taskArray = this.fb.array(taskFGs);
+        return taskArray;
     }
 
-    get tasks(): FormArray {
-        return this.tasksFormGroup.get('tasks') as FormArray;
+    get todosFA(): FormArray {
+        return this.todosFormGroup.get('todos') as FormArray;
     }
 
-    get task(): FormArray {
-        return this.tasksFormGroup.get('task') as FormArray;
-    }
-
-    addUnCompletedTasks(task, index): void {
+    addUnCompletedTasks(tasks, index): void {
         const textAreas: any = this.textArea.toArray();
-        task.controls.push(this.fb.group(new TaskItem()));
+        tasks.controls.push(this.fb.group(new Task()));
         this.setFocus(textAreas);
         // TODO: update db
     }
 
-    addToCompletedTasks(tasks, item): void {
-        tasks.completedTask.controls.push(item);
+    addToCompletedTasks(tasks, task): void {
+        tasks.completedTasks.controls.push(task);
         // TODO: update db
     }
 
-    addToUnCompletedTasks(tasks, item): void {
-        tasks.unCompletedTask.controls.push(item);
+    addToUnCompletedTasks(tasks, task): void {
+        tasks.unCompletedTasks.controls.push(task);
         // TODO: update db
     }
 
@@ -178,43 +174,43 @@ export class TodoComponent implements OnInit {
         }
       }
     }
-
-    changeTask(task, item): void {
+    // TODO: check me from template
+    changeTodo(todo, task): void {
         // TODO: save to db
-        if (!item.id.value) {
+        if (!task.id.value) {
         // TODO: create new
         return;
         }
         // TODO: update new Task Object
-        const updateTaskRef: Task = new Task();
+        const updateTaskRef: Todo = new Todo();
         // console.log(updateTaskRef)
     }
 
-    markTaskAsCompleted(task, item, index, event): void {
+    markTaskAsCompleted(tasks, task, index, event): void {
         if (event.checked) {
-            task.completedTask.push(item);
-            this.removeFromUnCompletedTasks(task, index);
+            tasks.completedTasks.push(task);
+            this.removeFromUnCompletedTasks(tasks, index);
             // TODO: update db
             // task.completedTask.push()
         } else {
-            task.unCompletedTask.push(item);
-            this.removeFromCompletedTasks(task, index);
+            tasks.unCompletedTasks.push(task);
+            this.removeFromCompletedTasks(tasks, index);
             // TODO: update db
         }
     }
 
-    removeFromUnCompletedTasks(task, index): void {
-        task.unCompletedTask.controls.splice(index, 1);
+    removeFromUnCompletedTasks(tasks, index): void {
+        tasks.unCompletedTasks.controls.splice(index, 1);
         // TODO: update db
     }
 
-    removeFromCompletedTasks(task, index): void {
-        task.completedTask.controls.splice(index, 1);
+    removeFromCompletedTasks(tasks, index): void {
+        tasks.completedTasks.controls.splice(index, 1);
         // TODO: update db
     }
 
-    changeTheme(task, color: string): void {
-        task.controls.color.setValue(color);
+    changeTheme(tasks, color: string): void {
+        tasks.controls.color.setValue(color);
         // TODO: update db
     }
 
@@ -237,61 +233,61 @@ export class TodoComponent implements OnInit {
     }
 
     markAllTasksAsCompleted(tasks): void {
-      tasks.unCompletedTask.controls.map((task) => {
+      tasks.unCompletedTasks.controls.map((task) => {
         task.controls.completed.setValue(true);
       });
-      tasks.unCompletedTask.controls.map((item) => {
-        this.addToCompletedTasks(tasks, item);
+      tasks.unCompletedTasks.controls.map((task) => {
+        this.addToCompletedTasks(tasks, task);
       });
-      let index = tasks.unCompletedTask.controls.length - 1;
+      let index = tasks.unCompletedTasks.controls.length - 1;
       while (index >= 0) {
         this.removeFromUnCompletedTasks(tasks, index);
-        index = tasks.unCompletedTask.controls.length - 1;
+        index = tasks.unCompletedTasks.controls.length - 1;
       }
       // TODO: update db
     }
 
     markAllTaslsAsInCompleted(tasks): void {
-      tasks.completedTask.controls.map((task) => {
+      tasks.completedTasks.controls.map((task) => {
         task.controls.completed.setValue(false);
       });
-      tasks.completedTask.controls.map((item) => {
-        this.addToUnCompletedTasks(tasks, item);
+      tasks.completedTasks.controls.map((task) => {
+        this.addToUnCompletedTasks(tasks, task);
       });
-      let index = tasks.completedTask.controls.length - 1;
+      let index = tasks.completedTasks.controls.length - 1;
       while (index >= 0) {
         this.removeFromCompletedTasks(tasks, index);
-        index = tasks.completedTask.controls.length - 1;
+        index = tasks.completedTasks.controls.length - 1;
       }
       // TODO: update db
     }
 
-    deleteCompletedItems(tasks): void {
-      let index = tasks.completedTask.controls.length - 1;
+    deleteCompletedTasks(tasks): void {
+      let index = tasks.completedTasks.controls.length - 1;
       while (index >= 0) {
         this.removeFromCompletedTasks(tasks, index);
-        index = tasks.completedTask.controls.length - 1;
+        index = tasks.completedTasks.controls.length - 1;
       }
       // TODO: update db
     }
 
-    deleteTask(task, index): void {
-      this.tasks.removeAt(index);
+    deleteTodo(todo, index): void {
+      this.todosFA.removeAt(index);
        // TODO: update db
     }
 
-    hideCompletedTodos(task): void {
-      if (task.hideCheckedItems.value) {
-        task.hideCheckedItems.setValue(false);
+    hideCompletedTasks(tasks): void {
+      if (tasks.hideCheckedItems.value) {
+        tasks.hideCheckedItems.setValue(false);
         // TODO: update db
       } else {
-        task.hideCheckedItems.setValue(true);
+        tasks.hideCheckedItems.setValue(true);
          // TODO: update db
       }
     }
 
     logChange() {
-      const nameControl = this.tasksFormGroup.get('tasks');
+      const nameControl = this.todosFormGroup.get('todos');
       nameControl.valueChanges.forEach(
         (value: string) => {
           console.log(value);
