@@ -6,6 +6,7 @@ import 'rxjs/add/operator/finally';
 
 import { TodoService } from './todo.service';
 import { Todo, Task } from './todo.model';
+import { Config } from '../config';
 
 @Component({
     selector: 'app-todo',
@@ -32,6 +33,7 @@ export class TodoComponent implements OnInit {
     selectedTask: Task;
     hideTasks: string = '';
     nameChangeLog: string[] = [];
+    themes = Config.themes;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
 
     constructor(private todoService: TodoService, private fb: FormBuilder) {}
@@ -50,7 +52,7 @@ export class TodoComponent implements OnInit {
 
     getTodos(): void {
         this.todos = this.todoService.getData()
-                        .finally(() => { console.log('data fetched!'); });
+                        .finally(() => console.log('data fetched!'));
         this.todos.subscribe((todos: Todo[]) => {
             this.todoArray = todos;
             this.setTodos(this.todoArray);
@@ -58,32 +60,30 @@ export class TodoComponent implements OnInit {
     }
 
     setTodos(todos: Todo[]): void {
-        const todoFGs = todos.map(todo => this.fb.group({
-            id: todo.id,
-            color: todo.color,
-            name: todo.name,
-            hideCheckedItems: todo.hideCheckedItems,
-            tasks: this.setTodoTasks(todo.tasks),
-            unCompletedTasks: this.setUncompletedTasks(todo.tasks),
-            completedTasks: this.setCompletedTasks(todo.tasks)
-        }));
-        const todoArray = this.fb.array(todoFGs);
-        this.todosFormGroup.setControl('todos', todoArray);
+      const todoFGs = todos.map(todo => this.fb.group({
+          id: todo.id,
+          color: todo.color,
+          name: todo.name,
+          hideCheckedItems: todo.hideCheckedItems,
+          tasks: this.setTodoTasks(todo.tasks),
+          unCompletedTasks: this.setUncompletedTasks(todo.tasks),
+          completedTasks: this.setCompletedTasks(todo.tasks)
+      }));
+      const todoArray = this.fb.array(todoFGs);
+      this.todosCtrl = todoArray;
     }
 
-    addEmptyTodo(todo: Todo): void {
-        const todoFG = this.fb.group({
-            id: null,
-            color: 'theme--white',
-            name: '',
-            hideCheckedItems: false,
-            tasks: this.setTodoTasks([]),
-            unCompletedTasks: this.setUncompletedTasks([]),
-            completedTasks: this.setCompletedTasks([])
-        });
-        const todoArray = this.todosFA;
-        todoArray.push(todoFG);
-        this.todosFormGroup.setControl('todos', todoArray);
+    addEmptyTodo(todo): void {
+      const todoFG = this.fb.group({
+          id: todo.id,
+          color: this.themes[0].className,
+          name: todo.name,
+          hideCheckedItems: todo.hideCheckedItems,
+          tasks: this.setTodoTasks([]),
+          unCompletedTasks: this.setUncompletedTasks([]),
+          completedTasks: this.setCompletedTasks([])
+      });
+      this.todosFA.push(todoFG);
         // TODO: update db
     }
 
@@ -98,9 +98,7 @@ export class TodoComponent implements OnInit {
           unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
           completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
       });
-      const todoArray = this.todosFA;
-      todoArray.insert(index, todoFG);
-      this.todosFormGroup.setControl('todos', todoArray);
+      this.todosFA.insert(index, todoFG);
       // TODO: update db
     }
 
@@ -142,8 +140,12 @@ export class TodoComponent implements OnInit {
         return this.todosFormGroup.get('todos') as FormArray;
     }
 
+    set todosCtrl(todoArray) {
+      this.todosFormGroup.setControl('todos', todoArray);
+    }
+
     addUnCompletedTasks(tasks, index): void {
-        const textAreas: any = this.textArea.toArray();
+        const textAreas = this.textArea.toArray();
         tasks.controls.push(this.fb.group(new Task()));
         this.setFocus(textAreas);
         // TODO: update db
@@ -159,18 +161,18 @@ export class TodoComponent implements OnInit {
         // TODO: update db
     }
 
-    removeUnCompletedTask(task, index): void {
-        this.removeFromUnCompletedTasks(task, index);
+    removeUnCompletedTask(tasks, index): void {
+        this.removeFromUnCompletedTask(tasks, index);
     }
 
     removeCompletedTask(task, index): void {
         this.removeFromCompletedTasks(task, index);
     }
 
-    removeItem(event, task, index): void {
+    removeTask(event, tasks, index): void {
       if (event.keyCode === 8) {
         if (!event.srcElement.value) {
-          this.removeUnCompletedTask(task, index);
+          this.removeUnCompletedTask(tasks, index);
         }
       }
     }
@@ -179,17 +181,16 @@ export class TodoComponent implements OnInit {
         // TODO: save to db
         if (!task.id.value) {
         // TODO: create new
-        return;
+        // return;
         }
         // TODO: update new Task Object
         const updateTaskRef: Todo = new Todo();
-        // console.log(updateTaskRef)
     }
 
     markTaskAsCompleted(tasks, task, index, event): void {
         if (event.checked) {
             tasks.completedTasks.push(task);
-            this.removeFromUnCompletedTasks(tasks, index);
+            this.removeFromUnCompletedTask(tasks, index);
             // TODO: update db
             // task.completedTask.push()
         } else {
@@ -199,7 +200,7 @@ export class TodoComponent implements OnInit {
         }
     }
 
-    removeFromUnCompletedTasks(tasks, index): void {
+    removeFromUnCompletedTask(tasks, index): void {
         tasks.unCompletedTasks.controls.splice(index, 1);
         // TODO: update db
     }
@@ -241,7 +242,7 @@ export class TodoComponent implements OnInit {
       });
       let index = tasks.unCompletedTasks.controls.length - 1;
       while (index >= 0) {
-        this.removeFromUnCompletedTasks(tasks, index);
+        this.removeFromUnCompletedTask(tasks, index);
         index = tasks.unCompletedTasks.controls.length - 1;
       }
       // TODO: update db

@@ -5,12 +5,14 @@ export class Todo {
     public tasks: Task[];
     public hideCheckedItems: boolean = false;
 }
+
 export class Task {
     public id: number = 0;
     public completed: boolean = false;
     public archived: boolean  = false;
     public title: string = '';
 }
+
 export const todos: Todo[] = [
     {
         'id': 1,
@@ -30,7 +32,7 @@ export const todos: Todo[] = [
         }]
     }, {
         'id': 2,
-        'color': 'theme--yellow-ligh',
+        'color': 'theme--yellow-light',
         'name': 'yesterdays task',
         'hideCheckedItems': true,
         'tasks': [{

@@ -8,16 +8,16 @@
     </div>
     <form [formGroup]="todosFormGroup">
         <div formArrayName="todos" class="todos-wrapper">
-            <mat-card *ngFor="let todo of todosFormGroup.get('todos').controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="todo.controls.color.value">
+            <mat-card *ngFor="let todo of todosFA.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="todo?.controls?.color?.value">
                 <mat-input-container floatPlaceholder="never" class="form-group">
-                    <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ todo.controls.name.value }}" (change)="changeTodo(todo, todo.controls)" placeholder="Title"></textarea>
+                    <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ todo?.controls?.name?.value }}" (change)="changeTodo(todo, todo.controls)" placeholder="Title"></textarea>
                 </mat-input-container>
                 <ul class="todos" formArrayName="unCompletedTasks">
                     <li *ngFor="let task of todo.controls.unCompletedTasks.controls; let x = index;" [formGroupName]="x">
                         <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(todo.controls,task, x,$event)">
                         </mat-checkbox>
                         <mat-input-container>
-                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ task?.controls?.title?.value }}" (change)="changeTodo(todo, task.controls)" (keydown)="removeItem($event,todo.controls, x)"></textarea>
+                            <textarea #textArea formControlName="title" class="textArea" matInput matTextareaAutosize type="text" value="{{ task?.controls?.title?.value }}" (change)="changeTodo(todo, task.controls)" (keydown)="removeTask($event,todo.controls, x)"></textarea>
                         </mat-input-container>
                         <span class="icon-delete" (click)="removeUnCompletedTask(todo.controls, x)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
@@ -59,12 +59,12 @@
                 <ul class="todos todos__actions">
                     <div class="theme-list">
                         <ul class="theme-container">
-                            <li class="theme theme--white" (click)="changeTheme(todo, 'theme--white')">
-                                <svg *ngIf="todo.controls.color.value == 'theme--white'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                            <li *ngFor="let theme of themes" class="theme" [ngClass]="theme.className" (click)="changeTheme(todo, theme.className)">
+                                <svg *ngIf="todo.controls.color.value == theme.className" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
                             </li>
-                            <li class="theme theme--cyan" (click)="changeTheme(todo, 'theme--cyan')">
+                            <!-- <li class="theme theme--cyan" (click)="changeTheme(todo, 'theme--cyan')">
                                 <svg *ngIf="todo.controls.color.value == 'theme--cyan'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
@@ -78,7 +78,7 @@
                                 <svg *ngIf="todo.controls.color.value == 'theme--yellow-light'" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                                 </svg>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
                     <li class="menu-more">
