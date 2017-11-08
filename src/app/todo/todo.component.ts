@@ -66,14 +66,13 @@ export class TodoComponent implements OnInit {
       this.todos.subscribe((todos: Todo[]) => {
           this.showLoder = false;
           this.todoArray = todos;
-          console.log(todos);
           this.setTodos(this.todoArray);
       });
     }
 
-    setTodos(todos: Todo[]): void {
+    setTodos(todos): void {
       const todoFGs = todos.map(todo => this.fb.group({
-        id: todo.id,
+        id: todo.key,
         color: todo.color,
         name: todo.name,
         hideCheckedItems: todo.hideCheckedItems,
@@ -83,7 +82,7 @@ export class TodoComponent implements OnInit {
       }));
       const todoArray = this.fb.array(todoFGs);
       this.todosCtrl = todoArray;
-      this.cardLayout();
+      // this.cardLayout();
     }
 
     addEmptyTodo(todo): void {
@@ -97,17 +96,16 @@ export class TodoComponent implements OnInit {
         completedTasks: this.setCompletedTasks([])
       });
       this.todosFA.push(todoFG);
-      let todoCopyFG = todoFG.getRawValue();
-      todoCopyFG = this.deleteUnCompletedTasksFromTodo(todoCopyFG);
-      todoCopyFG = this.deleteCompletedTasksFromTodo(todoCopyFG);
-      console.log(todoCopyFG);
-      // this.todosRef.push(todoCopyFG);
+      const todoCopyFG = todoFG.getRawValue();
+      delete todoCopyFG.unCompletedTasks;
+      delete todoCopyFG.completedTasks;
+      this.todosRef.push(todoCopyFG);
     }
 
     makeTodoCopy(todo, index): void {
-      let copyTodo = todo.getRawValue();
+      const copyTodo = todo.getRawValue();
       const todoFG = this.fb.group({
-        id: copyTodo.id + 1,
+        id: null,
         color: copyTodo.color,
         name: copyTodo.name,
         tasks: this.setTodoTasks(copyTodo.tasks),
@@ -115,24 +113,27 @@ export class TodoComponent implements OnInit {
         unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
         completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
       });
-      this.todosFA.insert(index, todoFG);
-      copyTodo = this.deleteUnCompletedTasksFromTodo(copyTodo);
-      copyTodo = this.deleteCompletedTasksFromTodo(copyTodo);
+      // TODO: update db
+      delete copyTodo.unCompletedTasks;
+      delete copyTodo.completedTasks;
       this.todosRef.push(copyTodo);
+      // this.todosFA.insert(index, todoFG);
     }
 
     addNewTodo(): void {
       this.addEmptyTodo(new Todo());
-      this.cardLayout();
+      // this.cardLayout();
     }
 
     setTodoTasks(tasks): FormArray {
+      if (!tasks) { return this.fb.array([]); }
       const taskFGs = tasks.map(task => this.fb.group(task));
       const taskArray = this.fb.array(taskFGs);
       return taskArray;
     }
 
     setUncompletedTasks(tasks: Task[]): FormArray {
+      if (!tasks) { return this.fb.array([]); }
       const unCompletedTasks: Task[] = [];
       tasks.forEach((task) => {
         if (!task.completed) {
@@ -145,6 +146,7 @@ export class TodoComponent implements OnInit {
     }
 
     setCompletedTasks(tasks: Task[]): FormArray {
+      if (!tasks) { return this.fb.array([]); }
       const completedTasks: Task[]  = [];
       tasks.forEach((task) => {
         if (task.completed) {
@@ -164,76 +166,87 @@ export class TodoComponent implements OnInit {
       this.todosFormGroup.setControl('todos', todoArray);
     }
 
-    addUnCompletedTasks(tasks, index): void {
+    addUnCompletedTasks(todo, index): void {
       const textAreas = this.textArea.toArray();
-      tasks.controls.push(this.fb.group(new Task()));
+      todo.controls.unCompletedTasks.controls.push(this.fb.group(new Task()));
       this.setFocus(textAreas);
-      // TODO: update db
     }
 
-    addToCompletedTasks(tasks, task): void {
-      tasks.completedTasks.controls.push(task);
-      // TODO: update db
+    addToCompletedTasks(todo, task): void {
+      todo.controls.completedTasks.controls.push(task);
     }
 
-    addToUnCompletedTasks(tasks, task): void {
-      tasks.unCompletedTasks.controls.push(task);
-      // TODO: update db
+    addToUnCompletedTasks(todo, task): void {
+      todo.controls.unCompletedTasks.controls.push(task);
     }
 
-    removeUnCompletedTask(tasks, index): void {
-      this.removeFromUnCompletedTask(tasks, index);
+    removeUnCompletedTask(todo, index): void {
+      this.removeFromUnCompletedTask(todo, index);
     }
 
-    removeCompletedTask(task, index): void {
-      this.removeFromCompletedTasks(task, index);
+    removeCompletedTask(todo, index): void {
+      this.removeFromCompletedTasks(todo, index);
     }
 
-    removeTask(event, tasks, index): void {
+    removeTask(event, todo, index): void {
       if (event.keyCode === 8) {
         if (!event.srcElement.value) {
-          this.removeUnCompletedTask(tasks, index);
+          this.removeUnCompletedTask(todo, index);
         }
       }
     }
 
-    // TODO: check me from template
-    changeTodo(todo, task): void {
-      // TODO: save to db
-      if (!task.id.value) {
-      // TODO: create new
-      // return;
-      }
-      // TODO: update new Task Object
-      const updateTaskRef: Todo = new Todo();
+    changeTodo(key, todo): void {
+      const copyTodo = todo.getRawValue();
+      const todoConcat = copyTodo.unCompletedTasks.concat(copyTodo.completedTasks);
+      delete copyTodo.unCompletedTasks;
+      delete copyTodo.completedTasks;
+      delete copyTodo.key;
+      copyTodo.tasks = todoConcat;
+      this.todosRef.update(key, copyTodo);
     }
 
-    markTaskAsCompleted(tasks, task, index, event): void {
+    markTaskAsCompleted(todo, task, index, event): void {
       if (event.checked) {
-        tasks.completedTasks.push(task);
-        this.removeFromUnCompletedTask(tasks, index);
-        // TODO: update db
-        // task.completedTask.push()
+        todo.controls.completedTasks.push(task);
+        task.controls.completed.setValue(true);
+        this.removeFromUnCompletedTask(todo, index);
       } else {
-        tasks.unCompletedTasks.push(task);
-        this.removeFromCompletedTasks(tasks, index);
-        // TODO: update db
+        todo.controls.unCompletedTasks.push(task);
+        task.controls.completed.setValue(false);
+        this.removeFromCompletedTasks(todo, index);
       }
     }
 
-    removeFromUnCompletedTask(tasks, index): void {
-      tasks.unCompletedTasks.controls.splice(index, 1);
-      // TODO: update db
+    removeFromUnCompletedTask(todo, index): void {
+      todo.controls.unCompletedTasks.controls.splice(index, 1);
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    removeFromCompletedTasks(tasks, index): void {
-      tasks.completedTasks.controls.splice(index, 1);
-      // TODO: update db
+    removeFromCompletedTasks(todo, index): void {
+      todo.controls.completedTasks.controls.splice(index, 1);
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    changeTheme(tasks, color: string): void {
-      tasks.controls.color.setValue(color);
-      // TODO: update db
+    deleteUnCompletedTasksFromTodo(todo) {
+      if (todo.unCompletedTasks) {
+        return delete todo.unCompletedTasks;
+      } else {
+        return todo;
+      }
+    }
+
+    deleteCompletedTasksFromTodo(todo) {
+      if (todo.completedTasks) {
+        return delete todo.completedTasks;
+      } else {
+        return todo;
+      }
+    }
+
+    changeTheme(todo, color: string): void {
+      todo.controls.color.setValue(color);
+      this.changeTodo(todo.controls.id.value, todo);
     }
 
     setFocus(textAreas): void {
@@ -254,76 +267,58 @@ export class TodoComponent implements OnInit {
       }, 200);
     }
 
-    markAllTasksAsCompleted(tasks): void {
-      tasks.unCompletedTasks.controls.map((task) => {
+    markAllTasksAsCompleted(todo): void {
+      todo.controls.unCompletedTasks.controls.map((task) => {
         task.controls.completed.setValue(true);
       });
-      tasks.unCompletedTasks.controls.map((task) => {
-        this.addToCompletedTasks(tasks, task);
+      todo.controls.unCompletedTasks.controls.map((task) => {
+        this.addToCompletedTasks(todo, task);
       });
-      let index = tasks.unCompletedTasks.controls.length - 1;
+      let index = todo.controls.unCompletedTasks.controls.length - 1;
       while (index >= 0) {
-        this.removeFromUnCompletedTask(tasks, index);
-        index = tasks.unCompletedTasks.controls.length - 1;
+        this.removeFromUnCompletedTask(todo, index);
+        index = todo.controls.unCompletedTasks.controls.length - 1;
       }
-      // TODO: update db
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    markAllTaslsAsInCompleted(tasks): void {
-      tasks.completedTasks.controls.map((task) => {
+    markAllTaslsAsInCompleted(todo): void {
+      todo.controls.completedTasks.controls.map((task) => {
         task.controls.completed.setValue(false);
       });
-      tasks.completedTasks.controls.map((task) => {
-        this.addToUnCompletedTasks(tasks, task);
+      todo.controls.completedTasks.controls.map((task) => {
+        this.addToUnCompletedTasks(todo, task);
       });
-      let index = tasks.completedTasks.controls.length - 1;
+      let index = todo.controls.completedTasks.controls.length - 1;
       while (index >= 0) {
-        this.removeFromCompletedTasks(tasks, index);
-        index = tasks.completedTasks.controls.length - 1;
+        this.removeFromCompletedTasks(todo, index);
+        index = todo.controls.completedTasks.controls.length - 1;
       }
-      // TODO: update db
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    deleteCompletedTasks(tasks): void {
-      let index = tasks.completedTasks.controls.length - 1;
+    deleteCompletedTasks(todo): void {
+      let index = todo.controls.completedTasks.controls.length - 1;
       while (index >= 0) {
-        this.removeFromCompletedTasks(tasks, index);
-        index = tasks.completedTasks.controls.length - 1;
+        this.removeFromCompletedTasks(todo, index);
+        index = todo.controls.completedTasks.controls.length - 1;
       }
-      // TODO: update db
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    deleteTodo(todo, index): void {
+    deleteTodo(key: string, todo, index): void {
       this.todosFA.removeAt(index);
-      this.cardLayout();
-      console.log(todo);
-       // TODO: update db
+      this.todosRef.remove(key);
+      // this.cardLayout();
     }
 
-    hideCompletedTasks(tasks): void {
-      if (tasks.hideCheckedItems.value) {
-        tasks.hideCheckedItems.setValue(false);
-        // TODO: update db
+    hideCompletedTasks(todo): void {
+      if (todo.controls.hideCheckedItems.value) {
+        todo.controls.hideCheckedItems.setValue(false);
       } else {
-        tasks.hideCheckedItems.setValue(true);
-        // TODO: update db
+        todo.controls.hideCheckedItems.setValue(true);
       }
-    }
-
-    deleteUnCompletedTasksFromTodo(todo) {
-      if (todo.unCompletedTasks) {
-        return delete todo.unCompletedTasks;
-      } else {
-        return todo;
-      }
-    }
-
-    deleteCompletedTasksFromTodo(todo) {
-      if (todo.completedTasks) {
-        return delete todo.completedTasks;
-      } else {
-        return todo;
-      }
+      if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
     logChange() {
@@ -342,7 +337,7 @@ export class TodoComponent implements OnInit {
         cardList = data.toArray();
       });
       setTimeout(() => {
-        console.log(cardList);
+        // console.log(cardList);
         cardList.forEach((item, index) => {
           this.cardListInfo.push({
             index: index,

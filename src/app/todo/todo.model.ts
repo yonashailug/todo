@@ -13,7 +13,7 @@ export class Task {
     public title: string = '';
 }
 
-export const todos: Todo[] = [{
+export const todos: any[] = [{
         'id': 1,
         'color': 'theme--white',
         'name': 'Todays task',
