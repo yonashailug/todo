@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChildren, ElementRef, QueryList } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChildren, ElementRef, QueryList, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
@@ -27,117 +28,136 @@ import { Config } from '../config';
 })
 export class TodoComponent implements OnInit {
 
-    todos: Observable<Todo[]>;
+    todosRef: AngularFireList<any[]>;
+    todos: Observable<any[]>;
     todoArray: Todo[] = [];
     todosFormGroup: FormGroup;
     selectedTask: Task;
     hideTasks: string = '';
     nameChangeLog: string[] = [];
     themes = Config.themes;
+    cardListInfo: Array<Object> = [];
+    showLoder: boolean = true;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
+    @ViewChildren('card') public cards: QueryList<ElementRef>;
 
-    constructor(private todoService: TodoService, private fb: FormBuilder) {}
+    constructor(private db: AngularFireDatabase, private todoService: TodoService, private fb: FormBuilder) {}
 
     ngOnInit() {
-        this.getTodos();
-        this.createForm();
-        // this.logChange();
+      this.createForm();
+      this.getTodos();
+      // this.logChange();
     }
 
     createForm(): void {
-        this.todosFormGroup = this.fb.group({
-            todos: this.fb.array([]),
-        });
+      this.todosFormGroup = this.fb.group({
+        todos: this.fb.array([]),
+      });
     }
 
     getTodos(): void {
-        this.todos = this.todoService.getData()
-                        .finally(() => console.log('data fetched!'));
-        this.todos.subscribe((todos: Todo[]) => {
-            this.todoArray = todos;
-            this.setTodos(this.todoArray);
-        });
+      this.todosRef = this.db.list('todos');
+      this.todos = this.todosRef.snapshotChanges().map(changes => {
+        return changes.map(c => ({
+          key: c.payload.key,
+          ...c.payload.val() }));
+      });
+      // this.todos = this.todoService.getData().finally(() => console.log('data arrived!'));
+      this.todos.subscribe((todos: Todo[]) => {
+          this.showLoder = false;
+          this.todoArray = todos;
+          console.log(todos);
+          this.setTodos(this.todoArray);
+      });
     }
 
     setTodos(todos: Todo[]): void {
       const todoFGs = todos.map(todo => this.fb.group({
-          id: todo.id,
-          color: todo.color,
-          name: todo.name,
-          hideCheckedItems: todo.hideCheckedItems,
-          tasks: this.setTodoTasks(todo.tasks),
-          unCompletedTasks: this.setUncompletedTasks(todo.tasks),
-          completedTasks: this.setCompletedTasks(todo.tasks)
+        id: todo.id,
+        color: todo.color,
+        name: todo.name,
+        hideCheckedItems: todo.hideCheckedItems,
+        tasks: this.setTodoTasks(todo.tasks),
+        unCompletedTasks: this.setUncompletedTasks(todo.tasks),
+        completedTasks: this.setCompletedTasks(todo.tasks)
       }));
       const todoArray = this.fb.array(todoFGs);
       this.todosCtrl = todoArray;
+      this.cardLayout();
     }
 
     addEmptyTodo(todo): void {
       const todoFG = this.fb.group({
-          id: todo.id,
-          color: this.themes[0].className,
-          name: todo.name,
-          hideCheckedItems: todo.hideCheckedItems,
-          tasks: this.setTodoTasks([]),
-          unCompletedTasks: this.setUncompletedTasks([]),
-          completedTasks: this.setCompletedTasks([])
+        id: todo.id,
+        color: this.themes[0].className,
+        name: todo.name,
+        hideCheckedItems: todo.hideCheckedItems,
+        tasks: this.setTodoTasks([]),
+        unCompletedTasks: this.setUncompletedTasks([]),
+        completedTasks: this.setCompletedTasks([])
       });
       this.todosFA.push(todoFG);
-        // TODO: update db
+      let todoCopyFG = todoFG.getRawValue();
+      todoCopyFG = this.deleteUnCompletedTasksFromTodo(todoCopyFG);
+      todoCopyFG = this.deleteCompletedTasksFromTodo(todoCopyFG);
+      console.log(todoCopyFG);
+      // this.todosRef.push(todoCopyFG);
     }
 
     makeTodoCopy(todo, index): void {
-      const copyTodo = todo.getRawValue();
+      let copyTodo = todo.getRawValue();
       const todoFG = this.fb.group({
-          id: copyTodo.id + 1,
-          color: copyTodo.color,
-          name: copyTodo.name,
-          tasks: this.setTodoTasks(copyTodo.tasks),
-          hideCheckedItems: copyTodo.hideCheckedItems,
-          unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
-          completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
+        id: copyTodo.id + 1,
+        color: copyTodo.color,
+        name: copyTodo.name,
+        tasks: this.setTodoTasks(copyTodo.tasks),
+        hideCheckedItems: copyTodo.hideCheckedItems,
+        unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
+        completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
       });
       this.todosFA.insert(index, todoFG);
-      // TODO: update db
+      copyTodo = this.deleteUnCompletedTasksFromTodo(copyTodo);
+      copyTodo = this.deleteCompletedTasksFromTodo(copyTodo);
+      this.todosRef.push(copyTodo);
     }
 
     addNewTodo(): void {
-        this.addEmptyTodo(new Todo());
+      this.addEmptyTodo(new Todo());
+      this.cardLayout();
     }
 
     setTodoTasks(tasks): FormArray {
-        const taskFGs = tasks.map(task => this.fb.group(task));
-        const taskArray = this.fb.array(taskFGs);
-        return taskArray;
+      const taskFGs = tasks.map(task => this.fb.group(task));
+      const taskArray = this.fb.array(taskFGs);
+      return taskArray;
     }
 
     setUncompletedTasks(tasks: Task[]): FormArray {
-        const unCompletedTasks: Task[] = [];
-        tasks.forEach((task) => {
-            if (!task.completed) {
-              unCompletedTasks.push(task);
-            }
-        });
-        const taskFGs = unCompletedTasks.map(task => this.fb.group(task));
-        const taskArray = this.fb.array(taskFGs);
-        return taskArray;
+      const unCompletedTasks: Task[] = [];
+      tasks.forEach((task) => {
+        if (!task.completed) {
+          unCompletedTasks.push(task);
+        }
+      });
+      const taskFGs = unCompletedTasks.map(task => this.fb.group(task));
+      const taskArray = this.fb.array(taskFGs);
+      return taskArray;
     }
 
     setCompletedTasks(tasks: Task[]): FormArray {
-        const completedTasks: Task[]  = [];
-        tasks.forEach((task) => {
-            if (task.completed) {
-              completedTasks.push(task);
-            }
-        });
-        const taskFGs = completedTasks.map(task => this.fb.group(task));
-        const taskArray = this.fb.array(taskFGs);
-        return taskArray;
+      const completedTasks: Task[]  = [];
+      tasks.forEach((task) => {
+        if (task.completed) {
+          completedTasks.push(task);
+        }
+      });
+      const taskFGs = completedTasks.map(task => this.fb.group(task));
+      const taskArray = this.fb.array(taskFGs);
+      return taskArray;
     }
 
     get todosFA(): FormArray {
-        return this.todosFormGroup.get('todos') as FormArray;
+      return this.todosFormGroup.get('todos') as FormArray;
     }
 
     set todosCtrl(todoArray) {
@@ -145,28 +165,28 @@ export class TodoComponent implements OnInit {
     }
 
     addUnCompletedTasks(tasks, index): void {
-        const textAreas = this.textArea.toArray();
-        tasks.controls.push(this.fb.group(new Task()));
-        this.setFocus(textAreas);
-        // TODO: update db
+      const textAreas = this.textArea.toArray();
+      tasks.controls.push(this.fb.group(new Task()));
+      this.setFocus(textAreas);
+      // TODO: update db
     }
 
     addToCompletedTasks(tasks, task): void {
-        tasks.completedTasks.controls.push(task);
-        // TODO: update db
+      tasks.completedTasks.controls.push(task);
+      // TODO: update db
     }
 
     addToUnCompletedTasks(tasks, task): void {
-        tasks.unCompletedTasks.controls.push(task);
-        // TODO: update db
+      tasks.unCompletedTasks.controls.push(task);
+      // TODO: update db
     }
 
     removeUnCompletedTask(tasks, index): void {
-        this.removeFromUnCompletedTask(tasks, index);
+      this.removeFromUnCompletedTask(tasks, index);
     }
 
     removeCompletedTask(task, index): void {
-        this.removeFromCompletedTasks(task, index);
+      this.removeFromCompletedTasks(task, index);
     }
 
     removeTask(event, tasks, index): void {
@@ -176,43 +196,44 @@ export class TodoComponent implements OnInit {
         }
       }
     }
+
     // TODO: check me from template
     changeTodo(todo, task): void {
-        // TODO: save to db
-        if (!task.id.value) {
-        // TODO: create new
-        // return;
-        }
-        // TODO: update new Task Object
-        const updateTaskRef: Todo = new Todo();
+      // TODO: save to db
+      if (!task.id.value) {
+      // TODO: create new
+      // return;
+      }
+      // TODO: update new Task Object
+      const updateTaskRef: Todo = new Todo();
     }
 
     markTaskAsCompleted(tasks, task, index, event): void {
-        if (event.checked) {
-            tasks.completedTasks.push(task);
-            this.removeFromUnCompletedTask(tasks, index);
-            // TODO: update db
-            // task.completedTask.push()
-        } else {
-            tasks.unCompletedTasks.push(task);
-            this.removeFromCompletedTasks(tasks, index);
-            // TODO: update db
-        }
+      if (event.checked) {
+        tasks.completedTasks.push(task);
+        this.removeFromUnCompletedTask(tasks, index);
+        // TODO: update db
+        // task.completedTask.push()
+      } else {
+        tasks.unCompletedTasks.push(task);
+        this.removeFromCompletedTasks(tasks, index);
+        // TODO: update db
+      }
     }
 
     removeFromUnCompletedTask(tasks, index): void {
-        tasks.unCompletedTasks.controls.splice(index, 1);
-        // TODO: update db
+      tasks.unCompletedTasks.controls.splice(index, 1);
+      // TODO: update db
     }
 
     removeFromCompletedTasks(tasks, index): void {
-        tasks.completedTasks.controls.splice(index, 1);
-        // TODO: update db
+      tasks.completedTasks.controls.splice(index, 1);
+      // TODO: update db
     }
 
     changeTheme(tasks, color: string): void {
-        tasks.controls.color.setValue(color);
-        // TODO: update db
+      tasks.controls.color.setValue(color);
+      // TODO: update db
     }
 
     setFocus(textAreas): void {
@@ -274,6 +295,8 @@ export class TodoComponent implements OnInit {
 
     deleteTodo(todo, index): void {
       this.todosFA.removeAt(index);
+      this.cardLayout();
+      console.log(todo);
        // TODO: update db
     }
 
@@ -283,7 +306,23 @@ export class TodoComponent implements OnInit {
         // TODO: update db
       } else {
         tasks.hideCheckedItems.setValue(true);
-         // TODO: update db
+        // TODO: update db
+      }
+    }
+
+    deleteUnCompletedTasksFromTodo(todo) {
+      if (todo.unCompletedTasks) {
+        return delete todo.unCompletedTasks;
+      } else {
+        return todo;
+      }
+    }
+
+    deleteCompletedTasksFromTodo(todo) {
+      if (todo.completedTasks) {
+        return delete todo.completedTasks;
+      } else {
+        return todo;
       }
     }
 
@@ -295,5 +334,25 @@ export class TodoComponent implements OnInit {
           this.nameChangeLog.push(value);
         }
       );
+    }
+
+    cardLayout() {
+      let cardList = [];
+      this.cards.changes.subscribe((data) => {
+        cardList = data.toArray();
+      });
+      setTimeout(() => {
+        console.log(cardList);
+        cardList.forEach((item, index) => {
+          this.cardListInfo.push({
+            index: index,
+            width: item.nativeElement.offsetWidth,
+            height: item.nativeElement.offsetHeight,
+            transformLeft: `translate(${index * item.nativeElement.offsetWidth}, 0)`,
+            className: item.nativeElement.classList.value
+          });
+          // item.nativeElement = `translate(${index*item.nativeElement.offsetWidth},0)`;
+        });
+      }, 100);
     }
 }

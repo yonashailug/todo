@@ -73,3 +73,11 @@ body {
 .mat-menu-panel {
     background: transparent !important;
 }
+
+.mat-card {
+    padding: 0 !important;
+}
+
+textarea.mat-input-element {
+    word-break: break-word;
+}

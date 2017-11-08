@@ -13,8 +13,7 @@ export class Task {
     public title: string = '';
 }
 
-export const todos: Todo[] = [
-    {
+export const todos: Todo[] = [{
         'id': 1,
         'color': 'theme--white',
         'name': 'Todays task',
@@ -23,12 +22,17 @@ export const todos: Todo[] = [
             'id': 1,
             'completed': true,
             'archived': false,
-            'title': 'Express JS'
+            'title': 'Watch acts of vengeance'
         }, {
             'id': 2,
             'completed': false,
             'archived': false,
-            'title': 'Node JS'
+            'title': 'Read quora posts'
+        }, {
+            'id': 3,
+            'completed': false,
+            'archived': false,
+            'title': 'Write blog post on medium'
         }]
     }, {
         'id': 2,
@@ -37,14 +41,14 @@ export const todos: Todo[] = [
         'hideCheckedItems': true,
         'tasks': [{
             'id': 1,
-            'completed': false,
-            'archived': false,
-            'title': 'Hapi JS',
-        }, {
-            'id': 2,
             'completed': true,
             'archived': false,
-            'title': 'Travis CI',
+            'title': 'Call to unknown',
+        }, {
+            'id': 2,
+            'completed': false,
+            'archived': false,
+            'title': 'Continuous integration with Travis',
         }]
     }
 ];

@@ -12,13 +12,25 @@
 
 .todos-wrapper {
     @include align-items(flex-start);
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+    width: 784px;
+    height: 700px;
 }
 
 .todos-container {
     max-width: 280px;
     min-width: 280px;
-    margin: 20px;
+    display: block;
+    // position: absolute;
+    margin: 16px;
     background: #fff;
+    box-sizing: border-box;
+}
+
+.card-style {
+    padding: 24px;
 }
 
 ul,
@@ -134,6 +146,8 @@ li:hover .icon-delete {
     @include flex-direction(row);
     @include justify-content(center);
     margin-bottom: 0;
+    padding: 8px 12px 8px;
+    background: #fff;
 }
 
 .theme-container li {
@@ -199,6 +213,10 @@ li:hover .icon-delete {
 
 .menu-more {
     margin-left: auto;
+}
+
+.menu-more,
+.theme-more {
     margin-bottom: 0;
 }
 
@@ -213,15 +231,16 @@ li:hover .icon-delete {
 
 .add-new-task-wrapper {
     position: fixed;
+    top: 0;
     left: 0;
     bottom: 0;
-    width: 100%;
+    height: 100%;
     background: #fff;
     z-index: 1;
     @include flexbox;
-    @include justify-content(center);
-    padding: 8px 0;
-    box-shadow: -30px -20px 50px 0 rgba(0, 0, 0, 0.1);
+    @include align-items(center);
+    padding: 8px;
+    box-shadow: 30px -20px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
 .add-new-task-wrapper span {
@@ -241,4 +260,68 @@ li:hover .icon-delete {
 
 .mat-input-element {
     color: rgba(0, 0, 0, 0.54);
+}
+
+.container-loader {
+    position: fixed;
+    left: 50%;
+    right: 0;
+    top: 50%;
+    @include flexbox;
+    @include justify-content(center);
+    transform: translate(-50%, -50%);
+}
+
+$offset: 187;
+$duration: 1.4s;
+.spinner {
+    animation: rotator $duration linear infinite;
+}
+
+@keyframes rotator {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(270deg);
+    }
+}
+
+.path {
+    stroke-dasharray: $offset;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: dash $duration ease-in-out infinite, colors ($duration*4) ease-in-out infinite;
+}
+
+@keyframes colors {
+    0% {
+        stroke: #4285F4;
+    }
+    25% {
+        stroke: #4285F4;
+    }
+    50% {
+        stroke: #4285F4;
+    }
+    75% {
+        stroke: #4285F4;
+    }
+    100% {
+        stroke: #4285F4;
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dashoffset: $offset;
+    }
+    50% {
+        stroke-dashoffset: $offset/4;
+        transform: rotate(135deg);
+    }
+    100% {
+        stroke-dashoffset: $offset;
+        transform: rotate(450deg);
+    }
 }

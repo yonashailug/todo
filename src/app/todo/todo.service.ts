@@ -12,5 +12,5 @@ export class TodoService {
   public getData(): Observable<Todo[]> {
     return of(todos).delay(this.delay);
   }
-
+  // TODO: use localstorage or firebase
 }
