@@ -15,7 +15,7 @@
     display: block;
     position: relative;
     box-sizing: border-box;
-    width: 784px;
+    // width: 784px;
     height: 700px;
 }
 
@@ -234,14 +234,13 @@ li:hover .icon-delete {
     position: fixed;
     top: 0;
     left: 0;
-    bottom: 0;
-    height: 100%;
+    width: 100%;
     background: #fff;
     z-index: 1;
     @include flexbox;
-    @include align-items(center);
+    @include justify-content(center);
     padding: 8px;
-    box-shadow: 30px -20px 50px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 30px 20px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
 .add-new-task-wrapper span {
@@ -324,5 +323,19 @@ $duration: 1.4s;
     100% {
         stroke-dashoffset: $offset;
         transform: rotate(450deg);
+    }
+}
+
+@media screen and (min-width: 756px) {
+    .add-new-task-wrapper {
+        position: fixed;
+        bottom: 0;
+        height: 100%;
+        width: initial;
+        box-shadow: 30px -20px 50px 0 rgba(0, 0, 0, 0.1);
+        @include align-items(center);
+    }
+    .todos-wrapper {
+        max-width: 784px;
     }
 }
