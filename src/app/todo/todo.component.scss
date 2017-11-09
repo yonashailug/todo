@@ -22,7 +22,8 @@
 .todos-container {
     max-width: 280px;
     min-width: 280px;
-    display: block;
+    display: inline-block;
+    vertical-align: top;
     // position: absolute;
     margin: 16px;
     background: #fff;

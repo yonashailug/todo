@@ -62,7 +62,6 @@ export class TodoComponent implements OnInit {
           key: c.payload.key,
           ...c.payload.val() }));
       });
-      // this.todos = this.todoService.getData().finally(() => console.log('data arrived!'));
       this.todos.subscribe((todos: Todo[]) => {
           this.showLoder = false;
           this.todoArray = todos;
