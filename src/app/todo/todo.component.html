@@ -40,7 +40,7 @@
                             <div class="title" *ngIf="todo.controls.completedTasks.controls.length > 1">{{todo?.controls.completedTasks.controls.length}} Completed items</div>
                         </div>
                         <div class="todos__list" [ngClass]="{'hide': todo.controls.hideCheckedItems.value}">
-                            <div formArrayName="completedTasks" [@fadeIn] *ngFor="let task of todo?.controls.completedTasks.controls; let i = index;">
+                            <div formArrayName="completedTasks" *ngFor="let task of todo?.controls.completedTasks.controls; let i = index;">
                                 <li [formGroupName]="i" class="completed">
                                     <mat-checkbox color="primary" class="checkbox" checked="checked" (change)="markTaskAsCompleted(todo,task, i,$event)">
                                     </mat-checkbox>
