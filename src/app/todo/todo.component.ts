@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ViewChildren, ElementRef, QueryList, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
@@ -29,7 +29,9 @@ import { Config } from '../config';
 export class TodoComponent implements OnInit {
 
     todosRef: AngularFireList<any[]>;
+    tasksRef: AngularFireObject<any>;
     todos: Observable<any[]>;
+    tasks: Observable<any[]>;
     todoArray: Todo[] = [];
     todosFormGroup: FormGroup;
     selectedTask: Task;
@@ -69,7 +71,14 @@ export class TodoComponent implements OnInit {
       });
     }
 
+    getTask(key) {
+      return this.db.object(`tasks/${key}`).snapshotChanges().subscribe((task) => {
+         return task.payload.val();
+      });
+    }
+
     setTodos(todos): void {
+      
       const todoFGs = todos.map(todo => this.fb.group({
         id: todo.key,
         color: todo.color,
@@ -81,6 +90,12 @@ export class TodoComponent implements OnInit {
       }));
       const todoArray = this.fb.array(todoFGs);
       this.todosCtrl = todoArray;
+      // setTimeout(() => {
+      //   if (this.getTask(todos[0].id)) {
+      //     console.log(this.getTask(todos[0].id));
+      //   }
+      // }, 500);
+
       // this.cardLayout();
     }
 
