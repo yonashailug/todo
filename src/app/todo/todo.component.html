@@ -76,39 +76,57 @@
                             <button mat-icon-button [matMenuTriggerFor]="menuMore">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
-                            <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before">
-                                <ul class="action-container" [ngClass]="todo.controls.color.value">
-                                    <li (click)="markAllTasksAsCompleted(todo)" class="icon-mark-all" *ngIf="todo.controls.unCompletedTasks.controls.length>0">
+                            <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before" [ngClass]="todo.controls.color.value">
+                                <!-- <ul class="action-container" > -->
+                                <button mat-menu-item (click)="markAllTasksAsCompleted(todo)" class="icon-mark-all" *ngIf="todo.controls.unCompletedTasks.controls.length>0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                                         <path d="M0 0h48v48H0z" fill="none"/>
                                         <path d="M36 14l-2.83-2.83-12.68 12.69 2.83 2.83L36 14zm8.49-2.83L23.31 32.34 14.97 24l-2.83 2.83L23.31 38l24-24-2.82-2.83zM.83 26.83L12 38l2.83-2.83L3.66 24 .83 26.83z"/>
                                     </svg><span class="small">Check Items</span>
-                                    </li>
-                                    <li (click)="markAllTaslsAsInCompleted(todo)" class="icon-mark-all" *ngIf="todo.controls.completedTasks.controls.length > 0">
+                                </button>
+                                <button mat-menu-item (click)="markAllTaslsAsInCompleted(todo)" class="icon-mark-all" *ngIf="todo.controls.completedTasks.controls.length > 0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
                                         <span class="small">Uncheck Items</span>
-                                    </li>
-                                    <li (click)="deleteCompletedTasks(todo)" class="icon-mark-all" *ngIf="todo.controls.completedTasks.controls.length > 0">
+                                    </button>
+                                <button mat-menu-item (click)="deleteCompletedTasks(todo)" class="icon-mark-all" *ngIf="todo.controls.completedTasks.controls.length > 0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                         </svg>
                                         <span class="small">Delete checked Items</span>
-                                    </li>
-                                    <li (click)="deleteTodo(todo.controls.id.value,i)" class="icon-mark-all">
+                                    </button>
+                                <button mat-menu-item (click)="deleteTodo(todo.controls.id.value,i)" class="icon-mark-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                                         <path d="M0 0h24v24H0z" fill="none"/>
                                     </svg>
                                         <span class="small">Delete</span>
-                                    </li>
-                                    <li (click)="makeTodoCopy(todo,i)" class="icon-mark-all">
+                                    </button>
+                                <button mat-menu-item (click)="makeTodoCopy(todo,i)" class="icon-mark-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                                         <span class="small">Make a copy</span>
-                                    </li>
-                                </ul>
+                                    </button>
+                                <button mat-menu-item [matMenuTriggerFor]="labels" class="icon-mark-all">
+                                        <!-- <button > -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+                                            <span class="small">Labels</span>
+                                </button>
+
+                                <mat-menu #labels="matMenu">
+                                    <div class="labels-container">
+                                        <!-- <button mat-menu-item > -->
+                                        <ng-container *ngFor="let label of defaultLabels; let i = index;">
+                                            <mat-checkbox class="label" checked="{{ -1 !== todo?.controls?.label?.value.indexOf(label) ? 'checked' : '' }}" color="primary" class="checkbox" (change)="updateLabels(todo?.controls?.id?.value, todo, $event, label)">{{ label }}</mat-checkbox>
+                                        </ng-container>
+                                        <!-- </button> -->
+                                    </div>
+                                </mat-menu>
+                                <!-- </ul> -->
                             </mat-menu>
                         </li>
                     </ul>
+                    <div class="todos labels" *ngIf="todo?.controls?.label?.controls?.length">
+                        <span *ngFor="let label of todo?.controls?.label?.controls">{{ label.value }}</span>
+                    </div>
                 </div>
             </mat-card>
         </div>

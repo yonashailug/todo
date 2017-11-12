@@ -16,4 +16,5 @@ export class Config {
             className: 'theme--red-light',
             colorValue: '#ff8a80'
         }];
+    public static defaultLabels = ['Inspiration', 'Personal', 'Work'];
 }

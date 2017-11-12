@@ -76,7 +76,7 @@ li {
 }
 
 .todos__actions li svg,
-.action-container li svg {
+.menu-more svg {
     fill: #777;
 }
 
@@ -271,6 +271,16 @@ li:hover .icon-delete {
     @include justify-content(center);
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+}
+
+.labels span {
+    display: inline-block;
+    margin-right: 8px;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 4px;
+    border-radius: 4px;
 }
 
 $offset: 187;

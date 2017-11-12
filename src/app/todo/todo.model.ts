@@ -3,6 +3,7 @@ export class Todo {
     public color: string = '';
     public name: string = '';
     public tasks: Task[];
+    public label: Array<string> = [];
     public hideCheckedItems: boolean = false;
 }
 

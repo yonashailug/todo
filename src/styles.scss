@@ -86,6 +86,10 @@ body {
 // .textArea {
 //     resize: vertical;
 // }
+.mat-menu-panel {
+    // background: transparent !important;
+}
+
 .theme--white .mat-checkbox-checkmark-path {
     stroke: #fff !important;
 }
@@ -111,12 +115,8 @@ body {
 }
 
 .mat-menu-content {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-}
-
-.mat-menu-panel {
-    background: transparent !important;
+    // padding-top: 0px !important;
+    // padding-bottom: 0px !important;
 }
 
 .mat-card {
@@ -125,6 +125,14 @@ body {
 
 textarea.mat-input-element {
     word-break: break-word;
+}
+
+.labels-container {
+    margin: 12px 8px;
+}
+
+.labels-container mat-checkbox {
+    display: block !important;
 }
 
 @media screen and (min-width: 756px) {

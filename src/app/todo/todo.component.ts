@@ -38,6 +38,7 @@ export class TodoComponent implements OnInit {
     hideTasks: string = '';
     nameChangeLog: string[] = [];
     themes = Config.themes;
+    defaultLabels = Config.defaultLabels;
     cardListInfo: Array<Object> = [];
     showLoder: boolean = true;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
@@ -72,17 +73,18 @@ export class TodoComponent implements OnInit {
     }
 
     getTask(key) {
-      return this.db.object(`tasks/${key}`).snapshotChanges().subscribe((task) => {
-         return task.payload.val();
+      this.db.object(`tasks/${key}`).snapshotChanges().subscribe((task) => {
+        console.log(task.payload.val());
+        return task.payload.val();
       });
     }
 
     setTodos(todos): void {
-      
       const todoFGs = todos.map(todo => this.fb.group({
         id: todo.key,
         color: todo.color,
         name: todo.name,
+        label: this.setTodoLabels(todo.label),
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks(todo.tasks),
         unCompletedTasks: this.setUncompletedTasks(todo.tasks),
@@ -90,12 +92,12 @@ export class TodoComponent implements OnInit {
       }));
       const todoArray = this.fb.array(todoFGs);
       this.todosCtrl = todoArray;
+      // console.log(this.getTask(todos[0].id));
       // setTimeout(() => {
       //   if (this.getTask(todos[0].id)) {
       //     console.log(this.getTask(todos[0].id));
       //   }
       // }, 500);
-
       // this.cardLayout();
     }
 
@@ -104,6 +106,7 @@ export class TodoComponent implements OnInit {
         id: todo.id,
         color: this.themes[0].className,
         name: todo.name,
+        label: this.setTodoLabels(todo.label),
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks([]),
         unCompletedTasks: this.setUncompletedTasks([]),
@@ -122,6 +125,7 @@ export class TodoComponent implements OnInit {
         id: null,
         color: copyTodo.color,
         name: copyTodo.name,
+        label: this.setTodoLabels(copyTodo.label),
         tasks: this.setTodoTasks(copyTodo.tasks),
         hideCheckedItems: copyTodo.hideCheckedItems,
         unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
@@ -134,6 +138,23 @@ export class TodoComponent implements OnInit {
       // this.todosFA.insert(index, todoFG);
     }
 
+    addLabels(todo) {
+      console.log(todo);
+    }
+
+    updateLabels(key, todo, event, label) {
+      if (event.checked) {
+        todo.controls.label.controls.push(this.fb.control(label));
+      } else {
+        todo.controls.label.controls.forEach((labelRef, index) => {
+          if (labelRef.value == label) {
+            todo.controls.label.controls.splice(index, 1);
+          }
+        });
+      }
+      this.changeTodo(key, todo);
+    }
+
     addNewTodo(): void {
       this.addEmptyTodo(new Todo());
       // this.cardLayout();
@@ -142,6 +163,13 @@ export class TodoComponent implements OnInit {
     setTodoTasks(tasks): FormArray {
       if (!tasks) { return this.fb.array([]); }
       const taskFGs = tasks.map(task => this.fb.group(task));
+      const taskArray = this.fb.array(taskFGs);
+      return taskArray;
+    }
+
+    setTodoLabels(labels): FormArray {
+      if (!labels) { return this.fb.array([]); }
+      const taskFGs = labels.map(label => this.fb.control(label));
       const taskArray = this.fb.array(taskFGs);
       return taskArray;
     }
