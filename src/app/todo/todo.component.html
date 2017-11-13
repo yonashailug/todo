@@ -124,7 +124,7 @@
                             </mat-input-container>
                         </div>
                         <ng-container *ngFor="let label of filteredLabels; let i = index;">
-                            <div class="form-group" [@fadeIn]>
+                            <div class="form-group">
                                 <mat-checkbox class="label" checked="{{ -1 !== todo?.controls?.label?.value.indexOf(label) ? 'checked' : '' }}" color="primary" class="checkbox" (change)="updateLabels(todo?.controls?.id?.value, todo, $event, label)"></mat-checkbox>{{ label }}
                             </div>
                         </ng-container>

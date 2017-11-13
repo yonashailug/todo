@@ -183,7 +183,6 @@ export class TodoComponent implements OnInit {
     addToLabel(key, todo, label) {
       todo.controls.label.controls.push(this.fb.control(label));
       todo.controls.label.value.push(label);
-      // this.filteredLabels = this.defaultLabels;
       this.filteredLabels.push(label);
       this.changeTodo(key, todo);
     }

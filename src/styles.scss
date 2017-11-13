@@ -42,6 +42,11 @@ body {
     // box-shadow: 10px 10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
+.page-container:after,
+.page-container:before {
+    display: none;
+}
+
 .page-container:before {
     left: 0;
     top: 0;
@@ -50,10 +55,10 @@ body {
 }
 
 .page-border:after {
-    left: 18px;
+    left: 0;
     top: 0;
+    right: 0;
     height: 36px;
-    right: 18px;
     box-shadow: 20px 10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -62,6 +67,7 @@ body {
     bottom: 0;
     height: 36px;
     right: 18px;
+    display: none;
     box-shadow: 20px 10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -176,5 +182,10 @@ textarea.mat-input-element {
     .page-border:before {
         left: 36px;
         right: 36px;
+        display: block;
+    }
+    .page-container:after,
+    .page-container:before {
+        display: block;
     }
 }
