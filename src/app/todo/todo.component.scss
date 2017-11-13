@@ -76,8 +76,9 @@ li {
 }
 
 .todos__actions li svg,
-.menu-more svg {
-    fill: #777;
+.menu-more svg,
+button svg {
+    fill: rgba(0, 0, 0, 0.54);
 }
 
 .icon-delete {
@@ -135,7 +136,7 @@ li:hover .icon-delete {
 }
 
 .icon-add svg {
-    fill: rgba(0, 0, 0, 0.5);
+    fill: rgba(0, 0, 0, 0.54);
 }
 
 .collapsed svg {
@@ -276,6 +277,7 @@ li:hover .icon-delete {
 .labels span {
     display: inline-block;
     margin-right: 8px;
+    margin-bottom: 4px;
     color: rgba(0, 0, 0, 0.65);
     font-size: 12px;
     background: rgba(0, 0, 0, 0.1);
