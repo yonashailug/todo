@@ -14,42 +14,54 @@ export class Task {
     public title: string = '';
 }
 
-export const todos: any[] = [{
-        'id': 1,
-        'color': 'theme--white',
-        'name': 'Todays task',
-        'hideCheckedItems': false,
-        'tasks': [{
-            'id': 1,
-            'completed': true,
-            'archived': false,
-            'title': 'Watch acts of vengeance'
-        }, {
-            'id': 2,
-            'completed': false,
-            'archived': false,
-            'title': 'Read quora posts'
-        }, {
-            'id': 3,
-            'completed': false,
-            'archived': false,
-            'title': 'Write blog post on medium'
-        }]
+export const todos: any = [{
+      'color' : 'theme--white',
+      'hideCheckedItems' : false,
+      'id' : '-Ky_ahV7RERew_ixkY_B',
+      'label' : [ 'Personal', 'Work' ],
+      'name' : 'Tommorows task'
     }, {
-        'id': 2,
-        'color': 'theme--yellow-light',
-        'name': 'yesterdays task',
-        'hideCheckedItems': true,
-        'tasks': [{
-            'id': 1,
-            'completed': true,
-            'archived': false,
-            'title': 'Call to unknown',
-        }, {
-            'id': 2,
-            'completed': false,
-            'archived': false,
-            'title': 'Continuous integration with Travis',
-        }]
-    }
-];
+      'color' : 'theme--white',
+      'hideCheckedItems' : false,
+      'id' : '-KydmuEkCq1eUqsGszec',
+      'label' : [ 'Work', 'Inspiration', 'Personal' ],
+      'name' : 'Todays task',
+      'tasks' : [ {
+        'archived' : false,
+        'completed' : false,
+        'id' : 0,
+        'title' : 'I am inserting this shit'
+      }, {
+        'archived' : false,
+        'completed' : false,
+        'id' : 0,
+        'title' : 'hello oword'
+      }, {
+        'archived' : false,
+        'completed' : true,
+        'id' : 0,
+        'title' : 'who cares about the dead fish'
+      }]
+    }, {
+      'color' : 'theme--red-light',
+      'hideCheckedItems' : false,
+      'id' : '-KydmwwGOtBkQblRysim',
+      'label' : [ 'Work', 'Inspiration' ],
+      'name' : 'Todays task',
+      'tasks' : [ {
+        'archived' : false,
+        'completed' : false,
+        'id' : 0,
+        'title' : 'I am inserting this shit'
+      }, {
+        'archived' : false,
+        'completed' : true,
+        'id' : 0,
+        'title' : 'hello oword'
+      }, {
+        'archived' : false,
+        'completed' : true,
+        'id' : 0,
+        'title' : 'who cares about the dead fish'
+      }]
+    }];

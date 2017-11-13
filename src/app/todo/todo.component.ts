@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, ViewChildren, ElementRef, QueryList, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
+import 'rxjs/add/operator/startWith';
 
 import { TodoService } from './todo.service';
 import { Todo, Task } from './todo.model';
@@ -27,7 +28,6 @@ import { Config } from '../config';
       ]
 })
 export class TodoComponent implements OnInit {
-
     todosRef: AngularFireList<any[]>;
     tasksRef: AngularFireObject<any>;
     todos: Observable<any[]>;
@@ -38,9 +38,13 @@ export class TodoComponent implements OnInit {
     hideTasks: string = '';
     nameChangeLog: string[] = [];
     themes = Config.themes;
-    defaultLabels = Config.defaultLabels;
+    defaultLabels: string[] = Config.defaultLabels;
     cardListInfo: Array<Object> = [];
+    filteredLabels: string[] = Config.defaultLabels;
+    filterLabelsFormControl: FormControl;
     showLoder: boolean = true;
+    labelId: string = '';
+    labelToAdd: string = '';
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
     @ViewChildren('card') public cards: QueryList<ElementRef>;
 
@@ -48,6 +52,7 @@ export class TodoComponent implements OnInit {
 
     ngOnInit() {
       this.createForm();
+      this.filterLabelsFormControl = new FormControl();
       this.getTodos();
       // this.logChange();
     }
@@ -65,11 +70,29 @@ export class TodoComponent implements OnInit {
           key: c.payload.key,
           ...c.payload.val() }));
       });
+      // this.todoService.getData().subscribe((todos: Todo[]) => {
+      //   this.showLoder = false;
+      //   this.todoArray = todos;
+      //   this.setTodos(this.todoArray);
+      // });
       this.todos.subscribe((todos: Todo[]) => {
           this.showLoder = false;
           this.todoArray = todos;
           this.setTodos(this.todoArray);
+          this.filteredLabels = this.getLabels(todos);
       });
+    }
+
+    getLabels(todos): string[] {
+      const labels: string[] = this.filteredLabels;
+      todos.forEach(todo => {
+        todo.label.forEach(label => {
+          if (-1 === labels.indexOf(label)) {
+            labels.push(label);
+          }
+        });
+      });
+      return labels;
     }
 
     getTask(key) {
@@ -138,21 +161,42 @@ export class TodoComponent implements OnInit {
       // this.todosFA.insert(index, todoFG);
     }
 
-    addLabels(todo) {
-      console.log(todo);
-    }
-
     updateLabels(key, todo, event, label) {
       if (event.checked) {
+        todo.controls.label.value.push(label);
         todo.controls.label.controls.push(this.fb.control(label));
       } else {
         todo.controls.label.controls.forEach((labelRef, index) => {
-          if (labelRef.value == label) {
+          if (labelRef.value === label) {
             todo.controls.label.controls.splice(index, 1);
+          }
+        });
+        todo.controls.label.value.forEach((labelRef, index) => {
+          if (labelRef === label) {
+            todo.controls.label.value.splice(index, 1);
           }
         });
       }
       this.changeTodo(key, todo);
+    }
+
+    addToLabel(key, todo, label) {
+      todo.controls.label.controls.push(this.fb.control(label));
+      todo.controls.label.value.push(label);
+      // this.filteredLabels = this.defaultLabels;
+      this.filteredLabels.push(label);
+      this.changeTodo(key, todo);
+    }
+
+    startFilter(todo, event) {
+      this.filterLabelsFormControl.valueChanges
+      .startWith(null)
+      .subscribe(label => { this.filteredLabels = this.filterLabels(todo, label); });
+    }
+
+    filterLabels(todo, label: string) {
+      this.labelToAdd = label;
+      return label ? this.defaultLabels.filter((filter) => new RegExp(`^${label}`, 'gi').test(filter)) : this.defaultLabels;
     }
 
     addNewTodo(): void {
@@ -391,5 +435,10 @@ export class TodoComponent implements OnInit {
           // item.nativeElement = `translate(${index*item.nativeElement.offsetWidth},0)`;
         });
       }, 100);
+    }
+
+    openLabelMenu(id: string) {
+      this.filterLabelsFormControl.setValue('');
+      this.labelId === id ? this.labelId = '' : this.labelId = id;
     }
 }

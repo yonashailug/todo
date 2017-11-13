@@ -62,7 +62,7 @@
                             <button mat-icon-button [matMenuTriggerFor]="themeMore">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                             </button>
-                            <mat-menu #themeMore="matMenu" [overlapTrigger]="false" xPosition="after">
+                            <mat-menu #themeMore="matMenu" [overlapTrigger]="false">
                                 <ul class="theme-container">
                                     <li *ngFor="let theme of themes" class="theme" [ngClass]="theme.className" (click)="changeTheme(todo, theme.className)">
                                         <svg *ngIf="todo.controls.color.value == theme.className" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
@@ -76,8 +76,7 @@
                             <button mat-icon-button [matMenuTriggerFor]="menuMore">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
-                            <mat-menu #menuMore="matMenu" [overlapTrigger]="false" xPosition="before" [ngClass]="todo.controls.color.value">
-                                <!-- <ul class="action-container" > -->
+                            <mat-menu #menuMore="matMenu" [overlapTrigger]="false" [ngClass]="todo.controls.color.value">
                                 <button mat-menu-item (click)="markAllTasksAsCompleted(todo)" class="icon-mark-all" *ngIf="todo.controls.unCompletedTasks.controls.length>0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                                         <path d="M0 0h48v48H0z" fill="none"/>
@@ -105,27 +104,35 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                                         <span class="small">Make a copy</span>
                                     </button>
-                                <button mat-menu-item [matMenuTriggerFor]="labels" class="icon-mark-all">
-                                        <!-- <button > -->
+                                <button mat-menu-item (click)="openLabelMenu(todo?.controls?.id)" class="icon-mark-all">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
                                             <span class="small">Labels</span>
                                 </button>
-
-                                <mat-menu #labels="matMenu">
-                                    <div class="labels-container">
-                                        <!-- <button mat-menu-item > -->
-                                        <ng-container *ngFor="let label of defaultLabels; let i = index;">
-                                            <mat-checkbox class="label" checked="{{ -1 !== todo?.controls?.label?.value.indexOf(label) ? 'checked' : '' }}" color="primary" class="checkbox" (change)="updateLabels(todo?.controls?.id?.value, todo, $event, label)">{{ label }}</mat-checkbox>
-                                        </ng-container>
-                                        <!-- </button> -->
-                                    </div>
-                                </mat-menu>
-                                <!-- </ul> -->
                             </mat-menu>
                         </li>
                     </ul>
                     <div class="todos labels" *ngIf="todo?.controls?.label?.controls?.length">
                         <span *ngFor="let label of todo?.controls?.label?.controls">{{ label.value }}</span>
+                    </div>
+                    <div class="labels-container" *ngIf="todo?.controls?.id === labelId">
+                        <div class="label-header">
+                            <button mat-icon-button (click)="openLabelMenu('')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                        </button>
+                            <mat-input-container floatPlaceholder="never">
+                                <input matInput (keydown)="startFilter(todo,$event)" type="text" autocomplete="off" [formControl]="filterLabelsFormControl" placeholder="Enter label name">
+                            </mat-input-container>
+                        </div>
+                        <ng-container *ngFor="let label of filteredLabels; let i = index;">
+                            <div class="form-group" [@fadeIn]>
+                                <mat-checkbox class="label" checked="{{ -1 !== todo?.controls?.label?.value.indexOf(label) ? 'checked' : '' }}" color="primary" class="checkbox" (change)="updateLabels(todo?.controls?.id?.value, todo, $event, label)"></mat-checkbox>{{ label }}
+                            </div>
+                        </ng-container>
+                        <button mat-menu-item *ngIf="!filteredLabels.length" (click)="addToLabel(todo?.controls?.id?.value, todo, labelToAdd);">
+                            <span class="icon-add checkbox"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+                            </span>create "{{ labelToAdd }}"
+                        </button>
                     </div>
                 </div>
             </mat-card>

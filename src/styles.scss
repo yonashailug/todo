@@ -131,8 +131,35 @@ textarea.mat-input-element {
     margin: 12px 8px;
 }
 
-.labels-container mat-checkbox {
-    display: block !important;
+.card-style {
+    position: relative;
+    overflow-y: auto;
+}
+
+.labels-container {
+    padding: 18px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #fff;
+    box-shadow: 0px -10px 40px 0 rgba(0, 0, 0, 0.1);
+    animation: fadeIn 400ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    transform-origin: bottom;
+}
+
+@keyframes fadeIn {
+    0% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        opacity: 1;
+    }
 }
 
 @media screen and (min-width: 756px) {
