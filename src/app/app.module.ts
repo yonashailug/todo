@@ -19,13 +19,16 @@ import { environment } from '../environments/environment';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'todo',
+    redirectTo: 'todo/',
     pathMatch: 'full'
   }, {
     path: 'home',
     component: AppComponent
   }, {
     path: 'todo',
+    component: TodoComponent
+  }, {
+    path: 'todo/:id',
     component: TodoComponent
   }, {
     path: '**',

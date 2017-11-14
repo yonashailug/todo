@@ -60,15 +60,16 @@ body {
     right: 0;
     height: 36px;
     box-shadow: 20px 10px 50px 0 rgba(0, 0, 0, 0.1);
+    display: none;
 }
 
 .page-border:before {
-    left: 18px;
+    left: 0;
     bottom: 0;
-    height: 36px;
-    right: 18px;
+    height: 56px;
+    right: 0;
     display: none;
-    box-shadow: 20px 10px 50px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 20px -10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
 .mat-form-field-underline {
@@ -155,6 +156,23 @@ textarea.mat-input-element {
     transform-origin: bottom;
 }
 
+.mat-checkbox-checked.mat-primary .mat-checkbox-background {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.mat-checkbox-checked .mat-checkbox-frame {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.mat-form-field-infix {
+    flex: initial !important;
+}
+
+.text-center {
+    text-align: center;
+    color: rgba(0, 0, 0, 0.54);
+}
+
 @keyframes fadeIn {
     0% {
         -webkit-transform: scaleY(0);
@@ -180,12 +198,12 @@ textarea.mat-input-element {
         right: 36px;
     }
     .page-border:before {
-        left: 36px;
-        right: 36px;
+        // left: 0;
+        // right: 36px;
         display: block;
     }
     .page-container:after,
     .page-container:before {
-        display: block;
+        display: none;
     }
 }

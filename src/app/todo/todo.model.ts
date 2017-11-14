@@ -1,4 +1,5 @@
-export class Todo {
+import { AbstractModel } from './../model/abstract.model';
+export class Todo extends AbstractModel {
     public id: number = 0;
     public color: string = '';
     public name: string = '';
@@ -18,12 +19,14 @@ export const todos: any = [{
       'color' : 'theme--white',
       'hideCheckedItems' : false,
       'id' : '-Ky_ahV7RERew_ixkY_B',
+      'key' : '-Ky_ahV7RERew_ixkY_B',
       'label' : [ 'Personal', 'Work' ],
       'name' : 'Tommorows task'
     }, {
       'color' : 'theme--white',
       'hideCheckedItems' : false,
       'id' : '-KydmuEkCq1eUqsGszec',
+      'key' : '-KydmuEkCq1eUqsGszec',
       'label' : [ 'Work', 'Inspiration', 'Personal' ],
       'name' : 'Todays task',
       'tasks' : [ {
@@ -46,6 +49,7 @@ export const todos: any = [{
       'color' : 'theme--red-light',
       'hideCheckedItems' : false,
       'id' : '-KydmwwGOtBkQblRysim',
+      'key' : '-KydmwwGOtBkQblRysim',
       'label' : [ 'Work', 'Inspiration' ],
       'name' : 'Todays task',
       'tasks' : [ {

@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ViewChildren, ElementRef, QueryList, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
@@ -38,21 +39,31 @@ export class TodoComponent implements OnInit {
     hideTasks: string = '';
     nameChangeLog: string[] = [];
     themes = Config.themes;
-    defaultLabels: string[] = Config.defaultLabels;
     cardListInfo: Array<Object> = [];
     filteredLabels: string[] = Config.defaultLabels;
+    defaultLabels: string[] = Config.defaultLabels;
+    availableLabels: string[] = [];
     filterLabelsFormControl: FormControl;
     showLoder: boolean = true;
     labelId: string = '';
     labelToAdd: string = '';
+    routeId: string = '';
+    todosSubscription: any;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
     @ViewChildren('card') public cards: QueryList<ElementRef>;
 
-    constructor(private db: AngularFireDatabase, private todoService: TodoService, private fb: FormBuilder) {}
+    constructor(private route: Router,
+      private router: ActivatedRoute,
+      private db: AngularFireDatabase,
+      private todoService: TodoService,
+      private fb: FormBuilder) {}
 
     ngOnInit() {
       this.createForm();
       this.filterLabelsFormControl = new FormControl();
+      this.todosSubscription = this.router.params.subscribe(params => {
+        this.routeId = params['id'];
+      });
       this.getTodos();
       // this.logChange();
     }
@@ -70,28 +81,31 @@ export class TodoComponent implements OnInit {
           key: c.payload.key,
           ...c.payload.val() }));
       });
-      // this.todoService.getData().subscribe((todos: Todo[]) => {
-      //   this.showLoder = false;
-      //   this.todoArray = todos;
-      //   this.setTodos(this.todoArray);
-      // });
       this.todos.subscribe((todos: Todo[]) => {
           this.showLoder = false;
           this.todoArray = todos;
-          this.setTodos(this.todoArray);
-          this.filteredLabels = this.getLabels(todos);
+          this.showTodosByLabel(this.routeId);
       });
+      // this.todoService.getData().subscribe((todos: Todo[]) => {
+      //   this.showLoder = false;
+      //   this.todoArray = todos;
+      //   this.showTodosByLabel();
+      // });
     }
 
     getLabels(todos): string[] {
       const labels: string[] = this.filteredLabels;
       todos.forEach(todo => {
+        if (!todo.label) {
+          return [];
+        }
         todo.label.forEach(label => {
           if (-1 === labels.indexOf(label)) {
             labels.push(label);
           }
         });
       });
+      this.availableLabels = labels;
       return labels;
     }
 
@@ -129,13 +143,13 @@ export class TodoComponent implements OnInit {
         id: todo.id,
         color: this.themes[0].className,
         name: todo.name,
-        label: this.setTodoLabels(todo.label),
+        label: this.setTodoLabels(this.routeId === 'home' ? [] : [this.routeId]),
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks([]),
         unCompletedTasks: this.setUncompletedTasks([]),
         completedTasks: this.setCompletedTasks([])
       });
-      this.todosFA.push(todoFG);
+      this.todosFA.insert(0, todoFG);
       const todoCopyFG = todoFG.getRawValue();
       delete todoCopyFG.unCompletedTasks;
       delete todoCopyFG.completedTasks;
@@ -155,10 +169,10 @@ export class TodoComponent implements OnInit {
         completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
       });
       // TODO: update db
+      this.todosFA.insert(index, todoFG);
       delete copyTodo.unCompletedTasks;
       delete copyTodo.completedTasks;
       this.todosRef.push(copyTodo);
-      // this.todosFA.insert(index, todoFG);
     }
 
     updateLabels(key, todo, event, label) {
@@ -177,17 +191,16 @@ export class TodoComponent implements OnInit {
           }
         });
       }
-      this.changeTodo(key, todo);
     }
 
-    addToLabel(key, todo, label) {
+    addToLabel(todo, label) {
       todo.controls.label.controls.push(this.fb.control(label));
       todo.controls.label.value.push(label);
-      this.filteredLabels.push(label);
-      this.changeTodo(key, todo);
+      this.availableLabels.push(label);
+      this.filteredLabels = this.availableLabels;
     }
 
-    startFilter(todo, event) {
+    startFilter(todo) {
       this.filterLabelsFormControl.valueChanges
       .startWith(null)
       .subscribe(label => { this.filteredLabels = this.filterLabels(todo, label); });
@@ -391,7 +404,7 @@ export class TodoComponent implements OnInit {
       if (todo) { this.changeTodo(todo.controls.id.value, todo); }
     }
 
-    deleteTodo(key: string, todo, index): void {
+    deleteTodo(key: string, index): void {
       this.todosFA.removeAt(index);
       this.todosRef.remove(key);
       // this.cardLayout();
@@ -439,5 +452,28 @@ export class TodoComponent implements OnInit {
     openLabelMenu(id: string) {
       this.filterLabelsFormControl.setValue('');
       this.labelId === id ? this.labelId = '' : this.labelId = id;
+    }
+
+    showTodosByLabel(label?: string) {
+      const todoArrayFiltered: Todo[] = [];
+      if (!label || label === 'home') {
+        this.setTodos(this.todoArray);
+        this.filteredLabels = this.getLabels(this.todoArray);
+        this.route.navigate(['/todo', 'home']);
+      } else {
+        this.route.navigate(['/todo', label]);
+        this.todoArray.forEach(todo => {
+          if (todo.label && -1 !== todo.label.indexOf(label)) {
+            todoArrayFiltered.push(todo);
+            this.setTodos(todoArrayFiltered);
+            this.filteredLabels = this.getLabels(this.todoArray);
+          }
+        });
+      }
+    }
+
+    previewImage(event) {
+      const fileList = event.target.files;
+      console.log(fileList);
     }
 }
