@@ -147,7 +147,9 @@ export class TodoComponent implements OnInit {
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks([]),
         unCompletedTasks: this.setUncompletedTasks([]),
-        completedTasks: this.setCompletedTasks([])
+        completedTasks: this.setCompletedTasks([]),
+        dateCreated: new Date(),
+        dateUpdated: new Date()
       });
       this.todosFA.insert(0, todoFG);
       const todoCopyFG = todoFG.getRawValue();
@@ -166,7 +168,9 @@ export class TodoComponent implements OnInit {
         tasks: this.setTodoTasks(copyTodo.tasks),
         hideCheckedItems: copyTodo.hideCheckedItems,
         unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
-        completedTasks: this.setCompletedTasks(copyTodo.completedTasks)
+        completedTasks: this.setCompletedTasks(copyTodo.completedTasks),
+        dateCreated: new Date(),
+        dateUpdated: new Date()
       });
       // TODO: update db
       this.todosFA.insert(index, todoFG);
@@ -301,6 +305,7 @@ export class TodoComponent implements OnInit {
       delete copyTodo.completedTasks;
       delete copyTodo.key;
       copyTodo.tasks = todoConcat;
+      copyTodo.dateUpdated = new Date();
       this.todosRef.update(key, copyTodo);
     }
 
