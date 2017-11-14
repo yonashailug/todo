@@ -23,13 +23,13 @@ describe('AppComponent', () => {
   it(`should have as title 'app'`, async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Simple Angular 4 todo');
+    expect(app.title).toEqual('Angular 4 Todo App');
   }));
 
   it('should render title in a p tag', async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('p').textContent).toContain('Simple Angular 4 todo');
+    expect(compiled.querySelector('p').textContent).toContain('Angular 4 Todo App');
   }));
 });
