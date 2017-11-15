@@ -31,7 +31,6 @@ import { Media } from '../model/media.model';
       ]
 })
 export class TodoComponent implements OnInit {
-    todosRef: AngularFireList<any[]>;
     tasksRef: AngularFireObject<any>;
     todos: Observable<any[]>;
     tasks: Observable<any[]>;
@@ -51,6 +50,7 @@ export class TodoComponent implements OnInit {
     labelToAdd: string = '';
     routeId: string = '';
     todosSubscription: any;
+    FORM_CONTROL_NAME: string = Config.FORM_CONTROL_NAME;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
     @ViewChildren('card') public cards: QueryList<ElementRef>;
 
@@ -77,19 +77,15 @@ export class TodoComponent implements OnInit {
     }
 
     getTodos(): void {
-      this.todosRef = this.db.list('todos');
-      this.todos = this.todosRef.snapshotChanges().map(changes => {
-        return changes.map(c => ({
-          key: c.payload.key,
-          ...c.payload.val() }));
+      this.todoService.getTodos().subscribe((todos: Todo[]) => {
+        this.showLoder = false;
+        this.todoArray = todos.reverse();
+        this.showTodosByLabel(this.routeId);
+      }, error => {
+        console.log("something is not right!");
       });
-      this.todos.subscribe((todos: Todo[]) => {
-          this.showLoder = false;
-          this.todoArray = todos.reverse();
-          this.showTodosByLabel(this.routeId);
-      });
-      // TODO: remove please just for debugging purpose
-      // this.todoService.getData().subscribe((todos: Todo[]) => {
+      // TODO: remove me please just for debugging purpose
+      // this.todoService.getLocalData().subscribe((todos: Todo[]) => {
       //   this.showLoder = false;
       //   this.todoArray = todos.reverse();
       //   this.showTodosByLabel();
@@ -164,7 +160,7 @@ export class TodoComponent implements OnInit {
       todoCopyFG.dateCreated = {};
       todoCopyFG.dateUpdated.time = firebase.database.ServerValue.TIMESTAMP;
       todoCopyFG.dateCreated.time = firebase.database.ServerValue.TIMESTAMP;
-      this.todosRef.push(todoCopyFG);
+      this.todoService.createTodo(todoCopyFG);
     }
 
     makeTodoCopy(todo, index): void {
@@ -188,7 +184,7 @@ export class TodoComponent implements OnInit {
       this.todosFA.insert(index, todoFG);
       delete copyTodo.unCompletedTasks;
       delete copyTodo.completedTasks;
-      this.todosRef.push(copyTodo);
+      this.todoService.createTodo(copyTodo);
     }
 
     updateLabels(key, todo, event, label) {
@@ -273,11 +269,11 @@ export class TodoComponent implements OnInit {
     }
 
     get todosFA(): FormArray {
-      return this.todosFormGroup.get('todos') as FormArray;
+      return this.todosFormGroup.get(this.FORM_CONTROL_NAME) as FormArray;
     }
 
     set todosCtrl(todoArray) {
-      this.todosFormGroup.setControl('todos', todoArray);
+      this.todosFormGroup.setControl(this.FORM_CONTROL_NAME, todoArray);
     }
 
     addUnCompletedTasks(todo, index): void {
@@ -319,7 +315,7 @@ export class TodoComponent implements OnInit {
       copyTodo.tasks = todoConcat;
       copyTodo.dateUpdated = {};
       copyTodo.dateUpdated.time = firebase.database.ServerValue.TIMESTAMP;
-      this.todosRef.update(key, copyTodo);
+      this.todoService.updateTodo(key, copyTodo);
     }
 
     markTaskAsCompleted(todo, task, index, event): void {
@@ -424,7 +420,7 @@ export class TodoComponent implements OnInit {
 
     deleteTodo(key: string, index): void {
       this.todosFA.removeAt(index);
-      this.todosRef.remove(key);
+      this.todoService.removeTodo(key);
       // this.cardLayout();
     }
 
@@ -438,7 +434,7 @@ export class TodoComponent implements OnInit {
     }
 
     logChange() {
-      const nameControl = this.todosFormGroup.get('todos');
+      const nameControl = this.todosFormGroup.get(this.FORM_CONTROL_NAME);
       nameControl.valueChanges.forEach(
         (value: string) => {
           console.log(value);

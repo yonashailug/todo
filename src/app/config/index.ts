@@ -16,5 +16,7 @@ export class Config {
             className: 'theme--red-light',
             colorValue: '#ff8a80'
         }];
-    public static defaultLabels = ['Inspiration', 'Personal', 'Work'];
+    public static defaultLabels: Array<string> = ['Inspiration', 'Personal', 'Work'];
+    public static DB_PATH: string = 'todos';
+    public static FORM_CONTROL_NAME: string = 'todos';
 }

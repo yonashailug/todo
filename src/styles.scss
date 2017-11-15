@@ -68,7 +68,6 @@ body {
     bottom: 0;
     height: 56px;
     right: 0;
-    display: none;
     box-shadow: 20px -10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -200,11 +199,6 @@ textarea.mat-input-element {
     .page-border:after {
         left: 36px;
         right: 36px;
-    }
-    .page-border:before {
-        // left: 0;
-        // right: 36px;
-        display: block;
     }
     .page-container:after,
     .page-container:before {

@@ -25,12 +25,12 @@
         <div formArrayName="todos" class="todos-wrapper" #cardWrapper>
             <mat-card *ngFor="let todo of todosFA?.controls;let i = index" [formGroupName]="i" class="todos-container" [ngClass]="todo?.controls?.color?.value">
                 <div class="card-style card-{{i}}" #card [ngStyle]="{'transform': cardListInfo[i]?.transformLeft}">
+                    <div class="image-container" *ngIf="todo?.controls?.mediaUrl?.value">
+                        <img [src]="todo?.controls?.mediaUrl?.value | mediaUrl">
+                    </div>
                     <mat-input-container floatPlaceholder="never" class="form-group">
                         <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ todo?.controls?.name?.value }}" (change)="changeTodo(todo?.controls?.id?.value, todo)" placeholder="Title"></textarea>
                     </mat-input-container>
-                    <div class="image-container">
-                        <img [src]="todo?.controls?.mediaUrl?.value | mediaUrl">
-                    </div>
                     <ul class="todos" formArrayName="unCompletedTasks">
                         <li *ngFor="let task of todo?.controls?.unCompletedTasks?.controls; let x = index;" [formGroupName]="x">
                             <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(todo, task, x, $event)">
