@@ -66,7 +66,8 @@ li {
     border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-.todos__actions.labels {
+.todos__actions.labels,
+.todos__actions.updated-time {
     border: 0;
 }
 
@@ -209,9 +210,16 @@ li:hover .icon-delete {
 // }
 .small {
     display: inline-block;
-    margin-left: 10px;
     font-size: 12px;
     white-space: nowrap;
+}
+
+button .small {
+    margin-left: 12px;
+}
+
+.updated-time .small {
+    font-style: italic;
 }
 
 .icon-mark-all {
@@ -313,6 +321,10 @@ li:hover .icon-delete {
 
 .create-label-btn .icon-add {
     line-height: 0;
+}
+
+.image-container img {
+    width: 100%;
 }
 
 $offset: 187;

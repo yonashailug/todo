@@ -3,6 +3,7 @@ export class Todo extends AbstractModel {
     public id: number = 0;
     public color: string = '';
     public name: string = '';
+    public mediaUrl: string = '';
     public tasks: Task[];
     public label: Array<string> = [];
     public hideCheckedItems: boolean = false;
@@ -21,7 +22,8 @@ export const todos: any = [{
       'id' : '-Ky_ahV7RERew_ixkY_B',
       'key' : '-Ky_ahV7RERew_ixkY_B',
       'label' : [ 'Personal', 'Work' ],
-      'name' : 'Tommorows task'
+      'name' : 'Tommorows task',
+      'mediaUrl': ''
     }, {
       'color' : 'theme--white',
       'hideCheckedItems' : false,
@@ -29,6 +31,7 @@ export const todos: any = [{
       'key' : '-KydmuEkCq1eUqsGszec',
       'label' : [ 'Work', 'Inspiration', 'Personal' ],
       'name' : 'Todays task',
+      'mediaUrl': '',
       'tasks' : [ {
         'archived' : false,
         'completed' : false,
@@ -52,6 +55,7 @@ export const todos: any = [{
       'key' : '-KydmwwGOtBkQblRysim',
       'label' : [ 'Work', 'Inspiration' ],
       'name' : 'Todays task',
+      'mediaUrl': '',
       'tasks' : [ {
         'archived' : false,
         'completed' : false,

@@ -1,6 +1,5 @@
 <div class="container" *ngIf="!showLoder">
     <ul class="main-menu">
-        <!-- add-new-task-wrapper -->
         <li class="link" (click)="addNewTodo()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                 <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
@@ -10,17 +9,9 @@
             Notes
         </li>
         <li class="label-menu-item">
-            <!-- <button mat-menu-item [matMenuTriggerFor]="labelTopMenu">
-            <span class="small">Labels</span>
-        </button> -->
             <button mat-menu-item *ngFor="let label of availableLabels" (click)="showTodosByLabel(label)">
                 <span class="small">{{ label }}</span>
             </button>
-            <!-- <mat-menu #labelTopMenu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item *ngFor="let label of availableLabels" (click)="showTodosByLabel(label)">
-                        <span class="small">{{ label }}</span>
-                    </button>
-            </mat-menu> -->
         </li>
     </ul>
     <p class="text-center" *ngIf="!todosFA?.controls.length">
@@ -37,6 +28,9 @@
                     <mat-input-container floatPlaceholder="never" class="form-group">
                         <textarea #textArea formControlName="name" class="textArea name" matInput matTextareaAutosize type="text" value="{{ todo?.controls?.name?.value }}" (change)="changeTodo(todo?.controls?.id?.value, todo)" placeholder="Title"></textarea>
                     </mat-input-container>
+                    <div class="image-container">
+                        <img [src]="todo?.controls?.mediaUrl?.value | mediaUrl">
+                    </div>
                     <ul class="todos" formArrayName="unCompletedTasks">
                         <li *ngFor="let task of todo?.controls?.unCompletedTasks?.controls; let x = index;" [formGroupName]="x">
                             <mat-checkbox color="primary" class="checkbox" (change)="markTaskAsCompleted(todo, task, x, $event)">
@@ -98,12 +92,8 @@
                         </li>
                         <li class="browse-image">
                             <button mat-icon-button (click)="imgFileInput.click();">
-                                    <input hidden type="file" #imgFileInput (change)="previewImage($event)"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                                    <!-- <mat-input-container>
-                                            <input type="file" accept="image/*" class="file" matInput />
-                                    </mat-input-container> -->
-                                    
+                                    <input hidden type="file" #imgFileInput (change)="uploadMedia(todo?.controls?.id?.value, $event)"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>                                    
                             </button>
                         </li>
                         <li class="menu-more">
@@ -147,6 +137,9 @@
                     </ul>
                     <div class="todos todos__actions labels" *ngIf="todo?.controls?.label?.controls?.length">
                         <span *ngFor="let label of todo?.controls?.label?.controls">{{ label.value }}</span>
+                    </div>
+                    <div class="todos todos__actions updated-time">
+                        <div class="small grey">{{ todo?.controls?.dateUpdated?.value?.time | date:'EEEE, h:mm a' }}</div>
                     </div>
                     <div class="labels-container" *ngIf="todo?.controls?.id?.value === labelId">
                         <div class="label-header">

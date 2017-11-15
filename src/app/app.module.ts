@@ -15,6 +15,8 @@ import { AppComponent } from './app.component';
 import { TodoComponent } from './todo/todo.component';
 import { TodoService } from './todo/todo.service';
 import { environment } from '../environments/environment';
+import { MediaUrlPipe } from './pipes/media.url.pipe';
+import { FirebaseStorageService } from './services/firebase.storage.service';
 
 const routes: Routes = [
   {
@@ -39,7 +41,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    TodoComponent
+    TodoComponent,
+    MediaUrlPipe
   ],
   imports: [
     BrowserModule,
@@ -61,8 +64,8 @@ const routes: Routes = [
     AngularFirestoreModule,
     AngularFireDatabaseModule
   ],
-  exports: [],
-  providers: [TodoService],
+  exports: [MediaUrlPipe],
+  providers: [TodoService, FirebaseStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

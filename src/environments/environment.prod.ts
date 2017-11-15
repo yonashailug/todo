@@ -6,7 +6,7 @@ export const environment = {
     authDomain: 'todo-f3651.firebaseapp.com',
     databaseURL: 'https://todo-f3651.firebaseio.com',
     projectId: 'todo-f3651',
-    storageBucket: '',
+    storageBucket: 'todo-f3651.appspot.com',
     messagingSenderId: '951040107681'
   }
 };

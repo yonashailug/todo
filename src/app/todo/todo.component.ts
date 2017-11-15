@@ -6,10 +6,12 @@ import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angular
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/startWith';
+import * as firebase from 'firebase';
 
 import { TodoService } from './todo.service';
 import { Todo, Task } from './todo.model';
 import { Config } from '../config';
+import { Media } from '../model/media.model';
 
 @Component({
     selector: 'app-todo',
@@ -83,12 +85,13 @@ export class TodoComponent implements OnInit {
       });
       this.todos.subscribe((todos: Todo[]) => {
           this.showLoder = false;
-          this.todoArray = todos;
+          this.todoArray = todos.reverse();
           this.showTodosByLabel(this.routeId);
       });
+      // TODO: remove please just for debugging purpose
       // this.todoService.getData().subscribe((todos: Todo[]) => {
       //   this.showLoder = false;
-      //   this.todoArray = todos;
+      //   this.todoArray = todos.reverse();
       //   this.showTodosByLabel();
       // });
     }
@@ -121,11 +124,14 @@ export class TodoComponent implements OnInit {
         id: todo.key,
         color: todo.color,
         name: todo.name,
+        mediaUrl: todo.mediaUrl || '',
         label: this.setTodoLabels(todo.label),
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks(todo.tasks),
         unCompletedTasks: this.setUncompletedTasks(todo.tasks),
-        completedTasks: this.setCompletedTasks(todo.tasks)
+        completedTasks: this.setCompletedTasks(todo.tasks),
+        dateUpdated: todo.dateUpdated,
+        dateCreated: todo.dateCreated
       }));
       const todoArray = this.fb.array(todoFGs);
       this.todosCtrl = todoArray;
@@ -143,18 +149,21 @@ export class TodoComponent implements OnInit {
         id: todo.id,
         color: this.themes[0].className,
         name: todo.name,
+        mediaUrl: todo.mediaUrl || '',
         label: this.setTodoLabels(this.routeId === 'home' ? [] : [this.routeId]),
         hideCheckedItems: todo.hideCheckedItems,
         tasks: this.setTodoTasks([]),
         unCompletedTasks: this.setUncompletedTasks([]),
-        completedTasks: this.setCompletedTasks([]),
-        dateCreated: new Date(),
-        dateUpdated: new Date()
+        completedTasks: this.setCompletedTasks([])
       });
       this.todosFA.insert(0, todoFG);
       const todoCopyFG = todoFG.getRawValue();
       delete todoCopyFG.unCompletedTasks;
       delete todoCopyFG.completedTasks;
+      todoCopyFG.dateUpdated = {};
+      todoCopyFG.dateCreated = {};
+      todoCopyFG.dateUpdated.time = firebase.database.ServerValue.TIMESTAMP;
+      todoCopyFG.dateCreated.time = firebase.database.ServerValue.TIMESTAMP;
       this.todosRef.push(todoCopyFG);
     }
 
@@ -164,13 +173,16 @@ export class TodoComponent implements OnInit {
         id: null,
         color: copyTodo.color,
         name: copyTodo.name,
+        mediaUrl: copyTodo.mediaUrl,
         label: this.setTodoLabels(copyTodo.label),
         tasks: this.setTodoTasks(copyTodo.tasks),
         hideCheckedItems: copyTodo.hideCheckedItems,
         unCompletedTasks: this.setUncompletedTasks(copyTodo.unCompletedTasks),
         completedTasks: this.setCompletedTasks(copyTodo.completedTasks),
-        dateCreated: new Date(),
-        dateUpdated: new Date()
+        dateCreated: copyTodo.dateCreated,
+        dateUpdated: {
+          time: firebase.database.ServerValue.TIMESTAMP
+        }
       });
       // TODO: update db
       this.todosFA.insert(index, todoFG);
@@ -305,7 +317,8 @@ export class TodoComponent implements OnInit {
       delete copyTodo.completedTasks;
       delete copyTodo.key;
       copyTodo.tasks = todoConcat;
-      copyTodo.dateUpdated = new Date();
+      copyTodo.dateUpdated = {};
+      copyTodo.dateUpdated.time = firebase.database.ServerValue.TIMESTAMP;
       this.todosRef.update(key, copyTodo);
     }
 
@@ -477,8 +490,11 @@ export class TodoComponent implements OnInit {
       }
     }
 
-    previewImage(event) {
+    uploadMedia(key, event) {
       const fileList = event.target.files;
-      console.log(fileList);
+      const file = fileList.item(0);
+      const media = new Media(file);
+      this.todoService.uploadMedia(key, media);
     }
 }
+
