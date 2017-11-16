@@ -28,9 +28,9 @@ export class TodoService {
   public getTodos(): Observable<Todo[]> {
 
     return this.todosRef.snapshotChanges().map(changes => {
-      
+
       return changes.map(change => ({
-        key: change.payload.key,...change.payload.val() 
+        key: change.payload.key, ...change.payload.val()
       }));
 
     });
@@ -54,11 +54,11 @@ export class TodoService {
     const storageRef = firebase.storage().ref();
     const uploadTask = storageRef.child(`${key}`).put(media.file);
 
-    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,(snapshot: any) => {
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot: any) => {
       media.progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       console.log('Upload is ' + media.progress + '% done');
-    }, 
-    (error) => { console.log(error); }, 
+    },
+    (error) => { console.log(error); },
     () => {
         media.url = uploadTask.snapshot.downloadURL;
         media.name = media.file.name;

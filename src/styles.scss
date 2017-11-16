@@ -176,6 +176,10 @@ textarea.mat-input-element {
     color: #777;
 }
 
+.search-container .mat-form-field {
+    min-width: 400px;
+}
+
 @keyframes fadeIn {
     0% {
         -webkit-transform: scaleY(0);

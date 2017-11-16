@@ -327,6 +327,41 @@ button .small {
     width: 100%;
 }
 
+.header-search {
+    max-width: 500px;
+    background: #fff;
+    margin: 0 auto;
+    padding: 12px 24px;
+    margin-bottom: 32px;
+    box-shadow: 0px 10px 50px 0 rgba(0, 0, 0, 0.1);
+    @include flexbox;
+    @include flex-direction(row);
+}
+
+.header-search li {
+    margin-bottom: 0;
+}
+
+.header-search li span {
+    height: 24px;
+}
+
+.header-search li>* {
+    vertical-align: middle;
+}
+
+.header-search li span svg {
+    fill: rgba(0, 0, 0, 0.54);
+}
+
+.search-container {
+    margin-left: 24px;
+}
+
+.new-list {
+    margin-left: auto;
+}
+
 $offset: 187;
 $duration: 1.4s;
 .spinner {

@@ -45,6 +45,7 @@ export class TodoComponent implements OnInit {
     defaultLabels: string[] = Config.defaultLabels;
     availableLabels: string[] = [];
     filterLabelsFormControl: FormControl;
+    filterTodosFormControl: FormControl;
     showLoder: boolean = true;
     labelId: string = '';
     labelToAdd: string = '';
@@ -63,6 +64,7 @@ export class TodoComponent implements OnInit {
     ngOnInit() {
       this.createForm();
       this.filterLabelsFormControl = new FormControl();
+      this.filterTodosFormControl = new FormControl();
       this.todosSubscription = this.router.params.subscribe(params => {
         this.routeId = params['id'];
       });
@@ -88,7 +90,7 @@ export class TodoComponent implements OnInit {
       // this.todoService.getLocalData().subscribe((todos: Todo[]) => {
       //   this.showLoder = false;
       //   this.todoArray = todos.reverse();
-      //   this.showTodosByLabel();
+      //   this.showTodosByLabel(this.routeId);
       // });
     }
 
@@ -211,6 +213,37 @@ export class TodoComponent implements OnInit {
       this.availableLabels.push(label);
       this.filteredLabels = this.availableLabels;
     }
+
+    searchTodos(keyword: string) {
+      // console.log(keyword);
+      this.filterTodosFormControl.valueChanges
+      .startWith(null)
+      .subscribe(label => {
+        this.setTodos(this.filterTodos(label));
+      });
+    }
+
+    filterTodos(keyword: string) {
+      if (keyword) {
+        return this.todoArray.filter((filter) => {
+          const name = new RegExp(`^${keyword}`, 'gi').test(filter.name);
+          // const label = filter.label.filter(label => new RegExp(`${keyword}`, 'gi').test(label));
+          if (name) {
+            return name;
+          }
+          // if (label) {
+          //   return label;
+          // }
+        });
+      } else {
+        return this.todoArray;
+      }
+    }
+
+    // TODO: filter by color with ui init
+    filterByColor() {}
+    // TODO: filter by label with ui init
+    filterByLabel() {}
 
     startFilter(todo) {
       this.filterLabelsFormControl.valueChanges
