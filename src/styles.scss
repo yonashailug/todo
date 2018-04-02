@@ -1,8 +1,241 @@
 /* You can add global styles to this file, and also import other style files */
 
 // @import '../node_modules/@angular/material/prebuilt-themes/indigo-pink.css';
+@import './_mixins.scss';
 @import "./_theme.scss";
 @import '../node_modules/dragula/dist/dragula.css';
+html {
+    line-height: 1.15;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+article,
+aside,
+footer,
+header,
+nav,
+section {
+    display: block;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+figcaption,
+figure,
+main {
+    display: block;
+}
+
+figure {
+    margin: 1em 40px;
+}
+
+hr {
+    box-sizing: content-box;
+    height: 0;
+    overflow: visible;
+}
+
+pre {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+}
+
+abbr[title] {
+    border-bottom: none;
+    text-decoration: underline;
+    text-decoration: underline dotted;
+}
+
+b,
+strong {
+    font-weight: inherit;
+}
+
+b,
+strong {
+    font-weight: bolder;
+}
+
+code,
+kbd,
+samp {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+dfn {
+    font-style: italic;
+}
+
+mark {
+    background-color: #ff0;
+    color: #000;
+}
+
+small {
+    font-size: 80%;
+}
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+sup {
+    top: -0.5em;
+}
+
+audio,
+video {
+    display: inline-block;
+}
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+img {
+    border-style: none;
+}
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: sans-serif;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
+
+button,
+input {
+    overflow: visible;
+}
+
+button,
+select {
+    text-transform: none;
+}
+
+button,
+html [type="button"],
+[type="reset"],
+[type="submit"] {
+    -webkit-appearance: button;
+}
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+fieldset {
+    padding: 0.35em 0.75em 0.625em;
+}
+
+legend {
+    box-sizing: border-box;
+    color: inherit;
+    display: table;
+    max-width: 100%;
+    padding: 0;
+    white-space: normal;
+}
+
+progress {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+textarea {
+    overflow: auto;
+}
+
+[type="checkbox"],
+[type="radio"] {
+    box-sizing: border-box;
+    padding: 0;
+}
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+    height: auto;
+}
+
+[type="search"] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px;
+}
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+ ::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit;
+}
+
+details,
+menu {
+    display: block;
+}
+
+summary {
+    display: list-item;
+}
+
+canvas {
+    display: inline-block;
+}
+
+template {
+    display: none;
+}
+
+[hidden] {
+    display: none;
+}
+
 html {
     font-size: 16px;
 }
@@ -17,11 +250,14 @@ html {
 
 body {
     background: #f1f1f1;
+    background: #f2f5f7;
     font-family: "Roboto", Helvetica, Arial, sans-serif;
+    color: #222;
 }
 
 .page-container {
     position: relative;
+    overflow: hidden;
 }
 
 .page-container:before,
@@ -30,7 +266,7 @@ body {
 .page-border:before {
     position: fixed;
     content: '';
-    background: #fff;
+    // background: #fff;
     z-index: 1;
 }
 
@@ -54,6 +290,11 @@ body {
     bottom: 0;
 }
 
+.page-container.open .wrapper {
+    @include transform(translateX(50%));
+    transition: transform 0.5s;
+}
+
 .page-border:after {
     left: 0;
     top: 0;
@@ -68,7 +309,7 @@ body {
     bottom: 0;
     height: 56px;
     right: 0;
-    box-shadow: 20px -10px 50px 0 rgba(0, 0, 0, 0.1);
+    // box-shadow: 20px -10px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
 .mat-form-field-underline {
@@ -176,8 +417,127 @@ textarea.mat-input-element {
     color: #777;
 }
 
+.uppercase {
+    text-transform: uppercase;
+}
+
+.title {
+    margin-bottom: 24px;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.medium {
+    font-weight: 700;
+    color: #222;
+}
+
+.signin-text {
+    margin-bottom: 8px;
+}
+
 .search-container .mat-form-field {
-    min-width: 400px;
+    width: initial;
+}
+
+.loading__line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 4px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.loading__line.line-grey {
+    background: #eee;
+    width: 100%;
+}
+
+.loading__line.line-red {
+    background: #777;
+    // background: #c31f35;
+    animation: drawer 3s ease-in-out infinite;
+    transform-origin: right left;
+    // animation-delay: 0s;
+}
+
+.message-area {
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    text-align: center;
+    padding: 8px 10px;
+    left: 50%;
+    min-width: initial;
+    transform: translateX(-50%);
+    background: #f8f3d6;
+    border: 1px solid #d0cbb2;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    @include flexbox;
+    @include align-items(center);
+    // animation: bounce 0.5s ease forwards;
+}
+
+.message-area p {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.message-area svg {
+    fill: rgba(0, 0, 0, 0.54);
+}
+
+.message-area .dismiss {
+    @include flexbox;
+    cursor: pointer;
+}
+
+.message-area .dismiss {
+    @include flexbox;
+    cursor: pointer;
+}
+
+.side-menu-container {
+    // background: white;
+    position: fixed;
+    // top: 50%;
+    // @include transform(translateY(-50%));
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    padding: 24px;
+    // box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.05);
+    display: block;
+}
+
+@keyframes drawer {
+    0% {
+        @include transform(translateX(-100%))
+    }
+    100% {
+        @include transform(translateX(100%))
+    }
+}
+
+@-webkit-keyframes drawer {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
 }
 
 @keyframes fadeIn {
@@ -207,5 +567,11 @@ textarea.mat-input-element {
     .page-container:after,
     .page-container:before {
         display: none;
+    }
+    .search-container .mat-form-field {
+        min-width: 400px;
+    }
+    .icon-menu {
+        display: none !important;
     }
 }

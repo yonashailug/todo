@@ -1,6 +1,7 @@
 @import "../../_mixins.scss";
 .container {
     margin: 0 20px 100px;
+    position: relative;
     @include justify-content(center);
 }
 
@@ -16,16 +17,16 @@
     box-sizing: border-box;
     @include justify-content(center);
     // width: 784px;
-    height: 700px;
+    // height: 700px;
 }
 
 .todos-container {
-    max-width: 280px;
     min-width: 280px;
+    width: 100%;
     display: inline-block;
     vertical-align: top;
     // position: absolute;
-    margin: 16px;
+    margin: 16px 0;
     background: #fff;
     box-sizing: border-box;
 }
@@ -82,7 +83,8 @@ li {
 
 .todos__actions li svg,
 .menu-more svg,
-button svg {
+button svg,
+.icon-close svg {
     fill: rgba(0, 0, 0, 0.54);
 }
 
@@ -330,12 +332,28 @@ button .small {
 .header-search {
     max-width: 500px;
     background: #fff;
-    margin: 0 auto;
+    margin: 0 20px;
     padding: 12px 24px;
     margin-bottom: 32px;
     box-shadow: 0px 10px 50px 0 rgba(0, 0, 0, 0.1);
     @include flexbox;
     @include flex-direction(row);
+}
+
+.header-search:before {
+    content: '';
+    position: fixed;
+    z-index: -10;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: block;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    transform-origin: center top;
+    background: #f2f5f7;
+    transition: transform 1s;
 }
 
 .header-search li {
@@ -359,6 +377,61 @@ button .small {
 }
 
 .new-list {
+    margin-left: auto;
+}
+
+.task-progress {
+    height: 2px;
+    position: relative;
+}
+
+.task-progress .task-progress-percent {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    color: rgba(0, 0, 0, 0.54);
+    padding-bottom: 4px;
+}
+
+.full-screen .header-search {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-width: 700px;
+    transition: 0.5s;
+    z-index: 10;
+}
+
+.full-screen .header-search:before {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+.full-screen .container {
+    z-index: 10;
+}
+
+.full-screen .main-menu {
+    display: none;
+}
+
+.full-screen .theme-container {
+    z-index: 11;
+    position: relative;
+    background: transparent;
+}
+
+.task-progress-bar {
+    width: 0%;
+    background: rgba(0, 0, 0, 0.54);
+    height: 100%;
+    display: inline-block;
+    position: absolute;
+}
+
+.icon-close {
+    cursor: pointer;
     margin-left: auto;
 }
 
@@ -423,4 +496,15 @@ $duration: 1.4s;
     }
 }
 
-@media screen and (min-width: 756px) {}
+@media screen and (min-width: 756px) {
+    .header-search {
+        margin: 0 auto 30px;
+    }
+    .full-screen .header-search {
+        width: 100%;
+    }
+    .todos-container {
+        max-width: 280px;
+        margin: 16px;
+    }
+}

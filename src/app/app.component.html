@@ -1,7 +1,33 @@
-<header class="header">
-    <p>
-        {{ title }}
-    </p>
-</header>
-
-<router-outlet></router-outlet>
+<div class="page-container" [ngClass]="{'open': isMenuToggled}">
+    <div class="page-border"></div>
+    <header class="header">
+        <div class="header-content-left">
+            <button mat-icon-button class="icon-menu" (click)="toggleMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            <span class="medium">my</span><span class="medium uppercase">Todo</span>
+        </div>
+        <div class="header-content-right" *ngIf="user?.getIsLoggedIn()">
+            <p class="display-name">{{ user?.getName() }}</p>
+            <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+                    <div class="avatar avatar--circle avatar--md">
+                            <img [src]="user?.getPhotoUrl()" />
+                        </div>
+                </button>
+            <mat-menu #profileMenu="matMenu" [overlapTrigger]="false">
+                <button mat-menu-item (click)="signOut()">Logout</button>
+            </mat-menu>
+        </div>
+    </header>
+    <div class="side-menu" *ngIf="isMenuToggled">
+        <div class="side-menu-container">
+            <button mat-menu-item (click)="changeLabel('home')">
+                <span class="small">Notes</span>
+            </button>
+            <button *ngFor="let label of labels" mat-menu-item (click)="changeLabel(label)">
+                <span class="small">{{ label }}</span>
+            </button>
+        </div>
+    </div>
+    <router-outlet></router-outlet>
+</div>

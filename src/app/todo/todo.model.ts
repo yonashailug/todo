@@ -1,6 +1,7 @@
-import { AbstractModel } from './../model/abstract.model';
+import { AbstractModel } from './../shared/model/abstract.model';
 export class Todo extends AbstractModel {
     public id: number = 0;
+    public uid: string = '';
     public color: string = '';
     public name: string = '';
     public mediaUrl: string = '';

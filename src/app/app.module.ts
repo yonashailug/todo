@@ -3,7 +3,14 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule, MatListModule, MatCardModule, MatMenuModule, MatButtonModule, MatCheckboxModule} from '@angular/material';
+import { MatInputModule, 
+  MatSnackBarModule, 
+  MatListModule, 
+  MatCardModule, 
+  MatMenuModule, 
+  MatButtonModule, 
+  MatCheckboxModule,
+  MatGridListModule} from '@angular/material';
 import { Routes, RouterModule } from '@angular/router';
 import { DragulaModule } from 'ng2-dragula';
 import { AngularFireModule } from 'angularfire2';
@@ -15,23 +22,26 @@ import { AppComponent } from './app.component';
 import { TodoComponent } from './todo/todo.component';
 import { TodoService } from './todo/todo.service';
 import { environment } from '../environments/environment';
-import { MediaUrlPipe } from './pipes/media.url.pipe';
-import { FirebaseStorageService } from './services/firebase.storage.service';
+import { SigninComponent } from './signin/signin.component';
+import { SharedModule } from './shared/shared.module';
+import { GuardService } from './shared/services/guard.service';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'todo/',
+    redirectTo: 'signin',
     pathMatch: 'full'
   }, {
-    path: 'home',
-    component: AppComponent
-  }, {
     path: 'todo',
-    component: TodoComponent
+    component: TodoComponent,
+    canActivate: [GuardService]
   }, {
     path: 'todo/:id',
-    component: TodoComponent
+    component: TodoComponent,
+    canActivate: [GuardService]
+  }, {
+    path: 'signin',
+    component: SigninComponent
   }, {
     path: '**',
     component: TodoComponent
@@ -42,7 +52,7 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     TodoComponent,
-    MediaUrlPipe
+    SigninComponent
   ],
   imports: [
     BrowserModule,
@@ -57,15 +67,18 @@ const routes: Routes = [
     MatCheckboxModule,
     MatCardModule,
     MatListModule,
+    MatSnackBarModule,
+    MatGridListModule,
     RouterModule.forRoot(routes),
     DragulaModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    SharedModule
   ],
-  exports: [MediaUrlPipe],
-  providers: [TodoService, FirebaseStorageService],
+  exports: [],
+  providers: [TodoService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

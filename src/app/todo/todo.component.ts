@@ -10,8 +10,12 @@ import * as firebase from 'firebase';
 
 import { TodoService } from './todo.service';
 import { Todo, Task } from './todo.model';
-import { Config } from '../config';
-import { Media } from '../model/media.model';
+import { Config } from '../shared/config';
+import { Media, MessageInfo } from '../shared/model';
+import { AuthService } from '../shared/services/auth.service';
+import { EventEmitterService } from '../shared/services/event-emitter.service';
+import { SnackBarService } from '../shared/services/snackbar.service';
+import { GlobalNotificationService } from '../shared/component/global-notification/global-notification.service';
 
 @Component({
     selector: 'app-todo',
@@ -35,6 +39,7 @@ export class TodoComponent implements OnInit {
     todos: Observable<any[]>;
     tasks: Observable<any[]>;
     todoArray: Todo[] = [];
+    todoArrayForFilter: Todo[] = [];
     todosFormGroup: FormGroup;
     selectedTask: Task;
     hideTasks: string = '';
@@ -51,7 +56,12 @@ export class TodoComponent implements OnInit {
     labelToAdd: string = '';
     routeId: string = '';
     todosSubscription: any;
+    fullScreenClass: boolean = false;
     FORM_CONTROL_NAME: string = Config.FORM_CONTROL_NAME;
+    // uploadProgress: any = { percent: 0,  key: '' };
+    uploadProgress: number = 0;
+    uploadId: string = '';
+    messageInfo: MessageInfo;
     @ViewChildren('textArea') public textArea: QueryList<ElementRef>;
     @ViewChildren('card') public cards: QueryList<ElementRef>;
 
@@ -59,7 +69,15 @@ export class TodoComponent implements OnInit {
       private router: ActivatedRoute,
       private db: AngularFireDatabase,
       private todoService: TodoService,
-      private fb: FormBuilder) {}
+      private authService: AuthService,
+      private snackBarService: SnackBarService,
+      private globalNotificationService: GlobalNotificationService,
+      private fb: FormBuilder,
+      private eventEmitterService: EventEmitterService) {
+        this.globalNotificationService.messageInfoChanges.subscribe((messageInfo: MessageInfo) => {
+            this.messageInfo = messageInfo;
+        });
+      }
 
     ngOnInit() {
       this.createForm();
@@ -67,6 +85,9 @@ export class TodoComponent implements OnInit {
       this.filterTodosFormControl = new FormControl();
       this.todosSubscription = this.router.params.subscribe(params => {
         this.routeId = params['id'];
+        if (this.routeId) {
+          this.showTodosByLabel(this.routeId);
+        }
       });
       this.getTodos();
       // this.logChange();
@@ -82,14 +103,25 @@ export class TodoComponent implements OnInit {
       this.todoService.getTodos().subscribe((todos: Todo[]) => {
         this.showLoder = false;
         this.todoArray = todos.reverse();
+        this.todoArrayForFilter = todos.reverse();
         this.showTodosByLabel(this.routeId);
       }, error => {
-        console.log("something is not right!");
+        this.messageInfo = new MessageInfo();
+        let message: string = '';
+        switch (error.code) {
+          case 'auth/network-request-failed':
+          message = 'A network error has occurred.';
+          break;
+        }
+        this.messageInfo.setMessageBody(message);
+        this.messageInfo.setIsError(true);
+        this.setNotificationMessage(this.messageInfo);
       });
       // TODO: remove me please just for debugging purpose
       // this.todoService.getLocalData().subscribe((todos: Todo[]) => {
       //   this.showLoder = false;
       //   this.todoArray = todos.reverse();
+      //   this.todoArrayForFilter = todos.reverse();
       //   this.showTodosByLabel(this.routeId);
       // });
     }
@@ -122,6 +154,7 @@ export class TodoComponent implements OnInit {
         id: todo.key,
         color: todo.color,
         name: todo.name,
+        uid: todo.uid,
         mediaUrl: todo.mediaUrl || '',
         label: this.setTodoLabels(todo.label),
         hideCheckedItems: todo.hideCheckedItems,
@@ -147,6 +180,7 @@ export class TodoComponent implements OnInit {
         id: todo.id,
         color: this.themes[0].className,
         name: todo.name,
+        uid: this.authService.getCurrentUser().uid,
         mediaUrl: todo.mediaUrl || '',
         label: this.setTodoLabels(this.routeId === 'home' ? [] : [this.routeId]),
         hideCheckedItems: todo.hideCheckedItems,
@@ -171,6 +205,7 @@ export class TodoComponent implements OnInit {
         id: null,
         color: copyTodo.color,
         name: copyTodo.name,
+        uid: copyTodo.uid,
         mediaUrl: copyTodo.mediaUrl,
         label: this.setTodoLabels(copyTodo.label),
         tasks: this.setTodoTasks(copyTodo.tasks),
@@ -218,14 +253,26 @@ export class TodoComponent implements OnInit {
       // console.log(keyword);
       this.filterTodosFormControl.valueChanges
       .startWith(null)
-      .subscribe(label => {
-        this.setTodos(this.filterTodos(label));
-      });
+      .subscribe(label => { this.setTodos(this.filterTodos(label)); });
     }
+
+    changeColorByFilter(colorName: string) {
+      this.setTodos(this.filterByColor(colorName));
+    }
+
+    filterByColor(colorName: string) {
+      if (colorName) {
+        return this.todoArrayForFilter.filter((filter) => new RegExp(`^${colorName}`, 'gi').test(filter.color));
+      } else {
+        return this.todoArrayForFilter;
+      }
+    }
+    // TODO: filter by label with ui init
+    filterByLabel() {}
 
     filterTodos(keyword: string) {
       if (keyword) {
-        return this.todoArray.filter((filter) => {
+        return this.todoArrayForFilter.filter((filter) => {
           const name = new RegExp(`^${keyword}`, 'gi').test(filter.name);
           // const label = filter.label.filter(label => new RegExp(`${keyword}`, 'gi').test(label));
           if (name) {
@@ -236,22 +283,17 @@ export class TodoComponent implements OnInit {
           // }
         });
       } else {
-        return this.todoArray;
+        return this.todoArrayForFilter;
       }
     }
 
-    // TODO: filter by color with ui init
-    filterByColor() {}
-    // TODO: filter by label with ui init
-    filterByLabel() {}
-
-    startFilter(todo) {
+    startFilter() {
       this.filterLabelsFormControl.valueChanges
       .startWith(null)
-      .subscribe(label => { this.filteredLabels = this.filterLabels(todo, label); });
+      .subscribe(label => { this.filteredLabels = this.filterLabels(label); });
     }
 
-    filterLabels(todo, label: string) {
+    filterLabels(label: string) {
       this.labelToAdd = label;
       return label ? this.defaultLabels.filter((filter) => new RegExp(`^${label}`, 'gi').test(filter)) : this.defaultLabels;
     }
@@ -523,7 +565,25 @@ export class TodoComponent implements OnInit {
       const fileList = event.target.files;
       const file = fileList.item(0);
       const media = new Media(file);
+      this.uploadProgress = 1;
+      this.uploadId = key;
       this.todoService.uploadMedia(key, media);
+      this.eventEmitterService.uploadProgressChanges.subscribe((progress) => {
+        this.uploadProgress += progress;
+      });
+    }
+
+    fullScreenSearch() {
+      this.fullScreenClass = true;
+    }
+
+    closeFullScreenSearch() {
+      this.fullScreenClass = false;
+      this.filterTodosFormControl.reset('');
+      this.setTodos(this.todoArray);
+    }
+    setNotificationMessage(messageInfo: MessageInfo) {
+      this.globalNotificationService.setNotificationMessage(messageInfo);
     }
 }
 
