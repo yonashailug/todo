@@ -16,9 +16,10 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 before_script:
-- npm install -g --silent firebase-tools
-- npm install -g @angular/cli
-- npm install
-- ng build
+  - npm install -g --silent firebase-tools
+  - npm install -g @angular/cli
+  - npm install
 after_success:
  - firebase deploy --token $FIREBASE_TOKEN 
+script:
+  - ng build
