@@ -1,10 +1,11 @@
-sudo: false
+sudo: required
 dist: trusty
 language: node_js
 node_js:
   - '7.0.0'
 addons:
 apt:
+  chrome: stable
   sources:
     - google-chrome
   packages:
